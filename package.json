@@ -1,0 +1,17 @@
+{
+  "name": "stepup-science",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StepUp Science tutoring portal with Supabase + Netlify functions + Paynow",
+  "scripts": {
+    "start": "npx serve .",
+    "check:functions": "node --check netlify/functions/paynow-pay.js && node --check netlify/functions/paynow-webhook.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.56.0",
+    "paynow": "^1.1.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

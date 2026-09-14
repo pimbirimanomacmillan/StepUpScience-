@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StepUp Science - Management & Admin Portal</title>
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="manifest" href="./manifest.json">
+
+
+  <!-- External Stylesheets & Libraries -->
+  <link 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+    rel="stylesheet"
+  >
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
+       ========================================================================== */
+    :root {
+      --primary: #0f172a;
+      --primary-hover: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --secondary: #7c3aed;
+      --dark-surface: #0f172a;
+      --light: #f8fafc;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================================================
+       2. GLOBAL RESET & BASE STYLES
+       ========================================================================== */
+    *, 
+    *::before, 
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--gray-800);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 80px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    input, 
+    select, 
+    textarea {
+      font: inherit;
+    }
+
+    /* ==========================================================================
+       3. HEADER & ADMIN NAVBAR
+       ========================================================================== */
+    header {
+      background: var(--dark-surface);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .header-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo i {
+      color: var(--warning);
+    }
+
+    .admin-badge {
+      background: #dc2626;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       4. CONTAINER & TAB PANELS
+       ========================================================================== */
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+      flex: 1;
+    }
+
+    .tab-panel {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-title i {
+      color: var(--accent);
+    }
+
+    /* ==========================================================================
+       5. METRIC & STATS GRID
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .icon-blue {
+      background: #eff6ff;
+      color: var(--accent);
+    }
+
+    .icon-purple {
+      background: #f5f3ff;
+      color: var(--secondary);
+    }
+
+    .icon-green {
+      background: var(--success-light);
+      color: #047857;
+    }
+
+    .stat-info .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+
+    .stat-info .label {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       6. DATA TABLES & STATUS BADGES
+       ========================================================================== */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background: var(--gray-100);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-800);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: var(--gray-50);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.725rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .badge-tier1 {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .badge-tier2 {
+      background: #f3e8ff;
+      color: #6b21a8;
+    }
+
+    .badge-free {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .badge-pending {
+      background: var(--warning-light);
+      color: #9a3412;
+    }
+
+    .badge-confirmed {
+      background: var(--success-light);
+      color: #065f46;
+    }
+
+    /* ==========================================================================
+       7. BUTTON STYLES & CONTROLS
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.775rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ==========================================================================
+       8. FORM INPUTS & UPLOAD CONTROLS
+       ========================================================================== */
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      color: var(--gray-800);
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* ==========================================================================
+       9. FIXED BOTTOM NAVIGATION DOCK
+       ========================================================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--dark-surface);
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+      height: 65px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem;
+      color: var(--gray-400);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 33.33%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .nav-item i {
+      font-size: 1.25rem;
+      margin-bottom: 0.2rem;
+      transition: var(--transition);
+    }
+
+    .nav-item.active {
+      color: var(--warning);
+    }
+
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       MAIN ADMIN HEADER
+       ========================================================================== -->
+  <header>
+    <div class="header-content">
+      <div class="brand-logo">
+        <i class="fa-solid fa-shield-halved"></i> StepUp Science
+      </div>
+      <div>
+        <span class="admin-badge">Admin Workspace</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       PRIMARY CONTAINER
+       ========================================================================== -->
+  <div class="container">
+
+    <!-- ==========================================================================
+         TAB 1: OVERVIEW & SYSTEM DASHBOARD
+         ========================================================================== -->
+    <div id="tab-dashboard" class="tab-panel active">
+      
+      <!-- Metrics Overview Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-blue">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <div class="value" id="stat-students">12</div>
+            <div class="label">Total Registered Students</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-purple">
+            <i class="fa-solid fa-credit-card"></i>
+          </div>
+          <div class="stat-info">
+            <div class="value" id="stat-paid">5</div>
+            <div class="label">Active Paid Subscribers</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-green">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <div class="value" id="stat-bookings">3</div>
+            <div class="label">Pending Session Requests</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-sliders"></i> Platform Management Actions
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-accent" onclick="switchTab('content', document.querySelectorAll('.nav-item')[1])">
+            <i class="fa-solid fa-upload"></i> Upload New Module PDF
+          </button>
+          <button class="btn btn-secondary" onclick="fetchStudentsFromSupabase()">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Dashboard Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Subscribed Students Roster -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-user-check"></i> Student Access Roster
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Access Tier</th>
+                <th>Status</th>
+                <th>Manual Override</th>
+              </tr>
+            </thead>
+            <tbody id="student-table-body">
+              <tr>
+                <td><strong>Macmillan Pimbirimano</strong></td>
+                <td><span class="badge badge-tier2">Tier 2 Premium</span></td>
+                <td><span class="badge badge-confirmed">Active</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="toggleAccess('Macmillan Pimbirimano', 'Free')">
+                    Downgrade
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>Tinashe Moyo</td>
+                <td><span class="badge badge-tier1">Tier 1 Basic</span></td>
+                <td><span class="badge badge-confirmed">Active</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="toggleAccess('Tinashe Moyo', 'Free')">
+                    Downgrade
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>Farai Zimba</td>
+                <td><span class="badge badge-free">Free Tier</span></td>
+                <td><span class="badge badge-free">Limited</span></td>
+                <td>
+                  <button class="btn btn-accent btn-sm" onclick="toggleAccess('Farai Zimba', 'Tier 2')">
+                    Grant Tier 2
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 2: CONTENT & MODULE MANAGEMENT
+         ========================================================================== -->
+    <div id="tab-content" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-file-circle-plus"></i> Upload & Manage Course Documents
+        </div>
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+          Add or update A-Level Physics & Chemistry PDF notes, past paper solutions, and revision keys.
+        </p>
+
+        <form id="content-upload-form" onsubmit="handleContentUpload(event)">
+          <div class="form-group">
+            <label>Module Title</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="upload-title" 
+              placeholder="e.g. Electromagnetism & Electromagnetic Induction" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Subject Category</label>
+            <select class="form-control" id="upload-subject" required>
+              <option value="Physics">A-Level Physics</option>
+              <option value="Chemistry">A-Level Chemistry</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Required Access Tier</label>
+            <select class="form-control" id="upload-tier" required>
+              <option value="Free">Free Access</option>
+              <option value="Tier 1">Tier 1 Required</option>
+              <option value="Tier 2">Tier 2 Required</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Upload Document File (PDF / Image Solutions)</label>
+            <input type="file" class="form-control" id="upload-file" accept=".pdf,.png,.jpg" required>
+          </div>
+
+          <button type="submit" class="btn btn-accent">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Module to Cloud Storage
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 3: TUITION SESSION BOOKINGS
+         ========================================================================== -->
+    <div id="tab-bookings" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-calendar-days"></i> Requested Tuition Sessions
+        </div>
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+          Review and confirm incoming 1-on-1 practical diagnostic and topic review bookings.
+        </p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Topic Focus</th>
+                <th>Requested Date & Time</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body">
+              <tr>
+                <td><strong>Macmillan Pimbirimano</strong></td>
+                <td>A-Level Chemistry (Organic Focus)</td>
+                <td>2026-09-02 @ 11:00 AM</td>
+                <td><span class="badge badge-pending">Pending</span></td>
+                <td>
+                  <button class="btn btn-accent btn-sm" onclick="confirmBooking(this)">
+                    Confirm
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>Kudzai Sithole</td>
+                <td>A-Level Physics (Practical Prep)</td>
+                <td>2026-09-05 @ 02:00 PM</td>
+                <td><span class="badge badge-confirmed">Confirmed</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" disabled>
+                    Done
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       BOTTOM NAVIGATION BAR
+       ========================================================================== -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('dashboard', this)">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('content', this)">
+      <i class="fa-solid fa-folder-plus"></i>
+      <span>Modules</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('bookings', this)">
+      <i class="fa-solid fa-calendar-check"></i>
+      <span>Bookings</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       APPLICATION LOGIC & SCRIPT
+       ========================================================================== -->
+  
+  <script>
+    const APP_CONFIG = {
+      SUPABASE_URL: 'https://phiyuvpwvaaarnockyqm.supabase.co/rest/v1/',
+      SUPABASE_ANON_KEY: 'sb_publishable_NFYozwSjCZ1gB8FONH8FhA_r-MJCAq6',
+      STORAGE_BUCKET: 'protected-content',
+      ADMIN_EMAILS: ['pimbirimanomacmillan@gmail.com']
+    };
+
+    let supabaseAdmin = null;
+    let adminSession = null;
+    let adminProfile = null;
+
+    function isConfigured() {
+      return !APP_CONFIG.SUPABASE_URL.includes('YOUR_PROJECT') && !APP_CONFIG.SUPABASE_ANON_KEY.includes('YOUR_PUBLIC_ANON_KEY');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function normalizeTier(value) {
+      if (!value) return 'Free';
+      const text = String(value).trim().toLowerCase();
+      if (text === 'tier 2' || text === '2' || text === 'premium') return 'Tier 2';
+      if (text === 'tier 1' || text === '1' || text === 'basic') return 'Tier 1';
+      return 'Free';
+    }
+
+    function tierBadge(tier) {
+      const normalized = normalizeTier(tier);
+      if (normalized === 'Tier 2') return 'badge-tier2';
+      if (normalized === 'Tier 1') return 'badge-tier1';
+      return 'badge-free';
+    }
+
+    function showConfigNotice() {
+      const container = document.querySelector('.container');
+      if (!container || document.getElementById('admin-config-notice')) return;
+      const notice = document.createElement('div');
+      notice.id = 'admin-config-notice';
+      notice.className = 'card';
+      notice.style.border = '1px solid #f59e0b';
+      notice.style.background = '#fffbeb';
+      notice.style.marginBottom = '1rem';
+      notice.innerHTML = `
+        <div class="card-title"><i class="fa-solid fa-triangle-exclamation"></i> Configuration required</div>
+        <p style="font-size:0.9rem;color:#92400e;">Replace the placeholder Supabase credentials and add your admin email to <strong>APP_CONFIG.ADMIN_EMAILS</strong> before using the admin portal.</p>`;
+      container.prepend(notice);
+    }
+
+    function ensureAdminOverlay() {
+      if (document.getElementById('admin-auth-overlay')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'admin-auth-overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.inset = '0';
+      overlay.style.background = 'rgba(15,23,42,0.82)';
+      overlay.style.display = 'none';
+      overlay.style.zIndex = '9999';
+      overlay.style.padding = '1rem';
+      overlay.innerHTML = `
+        <div style="max-width:440px;margin:8vh auto;background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+          <h3 style="margin-bottom:0.5rem;color:#0f172a;">Admin sign in required</h3>
+          <p style="font-size:0.9rem;color:#475569;margin-bottom:1rem;">Use an admin account before uploading files or changing student access.</p>
+          <div class="form-group"><label>Email</label><input id="admin-email" type="email" class="form-control" placeholder="admin@example.com"></div>
+          <div class="form-group"><label>Password</label><input id="admin-password" type="password" class="form-control" placeholder="Enter password"></div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button class="btn btn-accent" type="button" onclick="adminSignIn()"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+            <button class="btn btn-secondary" type="button" onclick="closeAdminOverlay()">Close</button>
+          </div>
+          <p id="admin-auth-message" style="font-size:0.8rem;color:#64748b;margin-top:0.75rem;"></p>
+        </div>`;
+      document.body.appendChild(overlay);
+    }
+
+    function openAdminOverlay(message = '') {
+      ensureAdminOverlay();
+      document.getElementById('admin-auth-overlay').style.display = 'block';
+      document.getElementById('admin-auth-message').innerText = message;
+    }
+
+    function closeAdminOverlay() {
+      const overlay = document.getElementById('admin-auth-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function initSupabase() {
+      if (!window.supabase || !isConfigured()) {
+        showConfigNotice();
+        return;
+      }
+      supabaseAdmin = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON_KEY);
+    }
+
+    async function currentUserIsAdmin(user) {
+      if (!user) return false;
+      if (APP_CONFIG.ADMIN_EMAILS.map(v => v.toLowerCase()).includes(String(user.email || '').toLowerCase())) return true;
+
+      const { data } = await supabaseAdmin
+        .from('profiles')
+        .select('id, full_name, role, access_tier')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      adminProfile = data || null;
+      return String(data?.role || '').toLowerCase() === 'admin';
+    }
+
+    async function ensureAdminAccess() {
+      if (!supabaseAdmin) return false;
+      const { data: { session } } = await supabaseAdmin.auth.getSession();
+      adminSession = session || null;
+      if (!adminSession?.user) {
+        openAdminOverlay('Please sign in with an admin account.');
+        return false;
+      }
+      const allowed = await currentUserIsAdmin(adminSession.user);
+      if (!allowed) {
+        openAdminOverlay('This account is signed in but is not marked as an admin in profiles.role.');
+        return false;
+      }
+      closeAdminOverlay();
+      return true;
+    }
+
+    async function adminSignIn() {
+      if (!supabaseAdmin) return alert('Add your Supabase project URL and anon key first.');
+      const email = document.getElementById('admin-email').value.trim();
+      const password = document.getElementById('admin-password').value.trim();
+      if (!email || !password) return alert('Enter admin email and password.');
+      const { error } = await supabaseAdmin.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      const ok = await ensureAdminAccess();
+      if (ok) {
+        await loadAdminData();
+        alert('Admin session ready.');
+      }
+    }
+
+    async function adminSignOut() {
+      if (!supabaseAdmin) return;
+      await supabaseAdmin.auth.signOut();
+      adminSession = null;
+      adminProfile = null;
+      openAdminOverlay('You have been signed out.');
+    }
+
+    function switchTab(tabName, targetElem) {
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const selectedTab = document.getElementById(`tab-${tabName}`);
+      if (selectedTab) selectedTab.classList.add('active');
+      if (targetElem) targetElem.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function prepareAdminUi() {
+      const uploadInput = document.getElementById('upload-file');
+      if (uploadInput) uploadInput.setAttribute('accept', '.pdf,.png,.jpg,.jpeg,.mp4,.webm,.mov');
+      const label = uploadInput?.closest('.form-group')?.querySelector('label');
+      if (label) label.innerText = 'Upload File (PDF / image / video)';
+    }
+
+    async function fetchDashboardStats() {
+      if (!(await ensureAdminAccess())) return;
+
+      const [{ count: studentsCount }, { count: modulesCount }, { count: pendingBookings }, { count: activeSubscribers }] = await Promise.all([
+        supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+        supabaseAdmin.from('modules').select('*', { count: 'exact', head: true }).eq('is_published', true),
+        supabaseAdmin.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }).neq('access_tier', 'Free')
+      ]);
+
+      if (document.getElementById('stat-students')) document.getElementById('stat-students').innerText = studentsCount ?? '0';
+      if (document.getElementById('stat-resources')) document.getElementById('stat-resources').innerText = modulesCount ?? '0';
+      if (document.getElementById('stat-bookings')) document.getElementById('stat-bookings').innerText = pendingBookings ?? '0';
+      if (document.getElementById('stat-active')) document.getElementById('stat-active').innerText = activeSubscribers ?? '0';
+    }
+
+    async function toggleAccess(studentId, newTier) {
+      if (!(await ensureAdminAccess())) return;
+      const tier = normalizeTier(newTier);
+      const payload = {
+        access_tier: tier,
+        access_expires_at: tier === 'Free' ? null : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      const { error } = await supabaseAdmin.from('profiles').update(payload).eq('id', studentId);
+      if (error) return alert(error.message);
+      await fetchStudentsFromSupabase();
+      alert(`Student access changed to ${tier}.`);
+    }
+
+    async function handleContentUpload(e) {
+      e.preventDefault();
+      if (!(await ensureAdminAccess())) return;
+
+      const title = document.getElementById('upload-title').value.trim();
+      const subject = document.getElementById('upload-subject').value;
+      const requiredTier = document.getElementById('upload-tier').value;
+      const file = document.getElementById('upload-file').files[0];
+      if (!title || !subject || !file) return alert('Please complete the upload form.');
+
+      const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '-')}`;
+      const filePath = `modules/${subject.toLowerCase()}/${safeName}`;
+      const kind = file.type.startsWith('video/') ? 'video' : (file.type.startsWith('image/') ? 'image' : 'pdf');
+
+      const { error: uploadError } = await supabaseAdmin.storage.from(APP_CONFIG.STORAGE_BUCKET).upload(filePath, file, { upsert: false, contentType: file.type || 'application/octet-stream' });
+      if (uploadError) return alert(uploadError.message);
+
+      const { error: insertError } = await supabaseAdmin.from('modules').insert({
+        title,
+        subject,
+        description: '',
+        required_tier: requiredTier,
+        kind,
+        file_path: filePath,
+        is_published: true,
+        created_by: adminSession.user.id
+      });
+      if (insertError) return alert(insertError.message);
+
+      document.getElementById('content-upload-form').reset();
+      await fetchDashboardStats();
+      alert(`Module uploaded and published successfully: ${title}`);
+    }
+
+    async function confirmBooking(bookingId) {
+      if (!(await ensureAdminAccess())) return;
+      const { error } = await supabaseAdmin.from('bookings').update({ status: 'confirmed' }).eq('id', bookingId);
+      if (error) return alert(error.message);
+      await fetchBookings();
+      await fetchDashboardStats();
+      alert('Tuition session booking confirmed.');
+    }
+
+    async function fetchBookings() {
+      if (!(await ensureAdminAccess())) return;
+      const { data, error } = await supabaseAdmin
+        .from('bookings')
+        .select('id, student_name, subject_focus, requested_date, requested_time, status')
+        .order('requested_date', { ascending: true });
+
+      if (error) return alert(error.message);
+      const body = document.getElementById('bookings-table-body');
+      if (!body) return;
+      if (!data?.length) {
+        body.innerHTML = '<tr><td colspan="5">No booking requests yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = data.map((row) => `
+        <tr>
+          <td>${escapeHtml(row.student_name || 'Unknown')}</td>
+          <td>${escapeHtml(row.subject_focus || '')}</td>
+          <td>${escapeHtml(row.requested_date || '')} @ ${escapeHtml(row.requested_time || '')}</td>
+          <td><span class="badge ${row.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending'}">${escapeHtml(row.status || 'pending')}</span></td>
+          <td>${row.status === 'confirmed'
+            ? '<button class="btn btn-secondary btn-sm" disabled>Done</button>'
+            : `<button class="btn btn-accent btn-sm" onclick="confirmBooking('${row.id}')">Confirm</button>`}</td>
+        </tr>`).join('');
+    }
+
+    async function fetchStudentsFromSupabase() {
+      if (!(await ensureAdminAccess())) return;
+      const { data, error } = await supabaseAdmin
+        .from('profiles')
+        .select('id, full_name, access_tier, access_expires_at, role')
+        .eq('role', 'student')
+        .order('full_name', { ascending: true });
+
+      if (error) return alert(error.message);
+      const body = document.getElementById('student-table-body');
+      if (!body) return;
+      if (!data?.length) {
+        body.innerHTML = '<tr><td colspan="4">No students found.</td></tr>';
+        return;
+      }
+      body.innerHTML = data.map((row) => {
+        const tier = normalizeTier(row.access_tier);
+        const active = tier === 'Free' ? 'Limited' : 'Active';
+        const nextTier = tier === 'Tier 2' ? 'Free' : 'Tier 2';
+        const btnText = tier === 'Tier 2' ? 'Downgrade' : 'Grant Tier 2';
+        const btnClass = tier === 'Tier 2' ? 'btn btn-secondary btn-sm' : 'btn btn-accent btn-sm';
+        return `
+          <tr>
+            <td><strong>${escapeHtml(row.full_name || 'Unnamed Student')}</strong></td>
+            <td><span class="badge ${tierBadge(tier)}">${escapeHtml(tier)}</span></td>
+            <td><span class="badge ${tier === 'Free' ? 'badge-free' : 'badge-confirmed'}">${active}</span></td>
+            <td><button class="${btnClass}" onclick="toggleAccess('${row.id}', '${nextTier}')">${btnText}</button></td>
+          </tr>`;
+      }).join('');
+      await fetchDashboardStats();
+    }
+
+    async function loadAdminData() {
+      await fetchDashboardStats();
+      await fetchStudentsFromSupabase();
+      await fetchBookings();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      prepareAdminUi();
+      initSupabase();
+      ensureAdminOverlay();
+      if (await ensureAdminAccess()) {
+        await loadAdminData();
+      }
+    });
+  </script>
+
+</body>
+</html>

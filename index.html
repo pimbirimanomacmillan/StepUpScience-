@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StepUp Science - Comprehensive Student Portal</title>
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="manifest" href="./manifest.json">
+
+
+  <!-- External Stylesheets & Libraries -->
+  <link 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+    rel="stylesheet"
+  >
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
+       ========================================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --secondary: #7c3aed;
+      --secondary-hover: #6d28d9;
+      --secondary-light: #f5f3ff;
+      --accent: #0284c7;
+      --dark: #0f172a;
+      --dark-surface: #1e293b;
+      --light: #f8fafc;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================================================
+       2. GLOBAL RESET & BASE STYLES
+       ========================================================================== */
+    *, 
+    *::before, 
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--light);
+      color: var(--gray-800);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    input, 
+    select, 
+    textarea {
+      font: inherit;
+    }
+
+    /* ==========================================================================
+       3. HEADER & TOP NAVIGATION
+       ========================================================================== */
+    header {
+      background: linear-gradient(135deg, var(--dark) 0%, #1e1b4b 100%);
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo i {
+      color: var(--warning);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--gray-300);
+      margin-top: 0.25rem;
+      font-weight: 400;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      margin-top: 0.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(4px);
+    }
+
+    /* ==========================================================================
+       4. CONTAINER & VIEW PANELS
+       ========================================================================== */
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1rem;
+      flex: 1;
+    }
+
+    .view-panel {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .view-panel.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-title i {
+      color: var(--primary);
+    }
+
+    .banner-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       5. BUTTON STYLES & CONTROLS
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-purple {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-purple:hover {
+      background: var(--secondary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ==========================================================================
+       6. GRID LAYOUT & RESOURCE CARDS
+       ========================================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .resource-card {
+      background: white;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .resource-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .resource-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .subject-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-physics {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .tag-chemistry {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .badge-locked {
+      background: var(--danger-light);
+      color: #991b1b;
+    }
+
+    .badge-free {
+      background: var(--success-light);
+      color: #065f46;
+    }
+
+    /* ==========================================================================
+       7. BOTTOM NAVIGATION DOCK
+       ========================================================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid var(--gray-200);
+      z-index: 1000;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+      height: 65px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem;
+      color: var(--gray-500);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 33.33%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .nav-item i {
+      font-size: 1.25rem;
+      margin-bottom: 0.2rem;
+      transition: var(--transition);
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
+
+    /* ==========================================================================
+       8. MODALS & FORM INPUT STYLES
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      animation: modalSlide 0.25s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      color: var(--gray-800);
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       MAIN APP HEADER
+       ========================================================================== -->
+  <header>
+    <div class="brand-logo">
+      <i class="fa-solid fa-atom"></i> StepUp Science
+    </div>
+    <div class="subtitle">
+      A-Level Physics & Chemistry Tuition Portal
+    </div>
+    <div class="user-badge" id="user-status-bar">
+      <i class="fa-solid fa-circle-user"></i> 
+      <span id="user-name-display">Guest Student</span> | 
+      <span id="user-role-display">Free Access</span>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       PRIMARY APP CONTENT CONTAINER
+       ========================================================================== -->
+  <div class="container">
+
+    <!-- ==========================================================================
+         VIEW 1: MODULE LISTINGS (HOME)
+         ========================================================================== -->
+    <div id="view-home" class="view-panel active">
+      
+      <!-- Upgrade Subscription Banner -->
+      <div class="card banner-card">
+        <div class="card-title">
+          <i class="fa-solid fa-graduation-cap"></i> Complete A-Level Syllabus Unlocked
+        </div>
+        <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1.25rem;" id="sub-status-text">
+          You are currently utilizing Free Access. Upgrade to unlock full access to paper solutions, worked chemistry mechanisms, and revision quizzes.
+        </p>
+        <button class="btn btn-purple" onclick="openSubscriptionModal()">
+          <i class="fa-solid fa-bolt"></i> Upgrade Tier (Paynow Ecocash/OneMoney)
+        </button>
+      </div>
+
+      <!-- Module Resources Section -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-book-open"></i> A-Level Study Modules
+        </div>
+        
+        <div class="grid-2">
+
+          <!-- Physics Module 1 (Free) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-physics">Physics</span>
+                <span class="badge badge-free" id="badge-phys1">FREE</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">Kinematics & Dynamics</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                Projectiles, Linear motion, Newton's Laws, and Vectors.
+              </p>
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="alert('Opening Mechanics & Kinematics Notes...')">
+                <i class="fa-solid fa-file-pdf"></i> Read Notes
+              </button>
+            </div>
+          </div>
+
+          <!-- Chemistry Module 1 (Free) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-chemistry">Chemistry</span>
+                <span class="badge badge-free" id="badge-chem1">FREE</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">Atomic Structure & Bonding</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                Orbitals, Ionization Energies, and Hybridization.
+              </p>
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="alert('Opening Atomic Structure Notes...')">
+                <i class="fa-solid fa-file-pdf"></i> Read Notes
+              </button>
+            </div>
+          </div>
+
+          <!-- Physics Module 2 (Locked) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-physics">Physics</span>
+                <span class="badge badge-locked" id="badge-phys2">LOCKED</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">DC Circuits & Resistance</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                Kirchhoff's Laws, Internal Resistance, Potential Dividers.
+              </p>
+            </div>
+            <div id="actions-phys2">
+              <button class="btn btn-secondary" onclick="openSubscriptionModal()">
+                <i class="fa-solid fa-lock"></i> Unlock Module
+              </button>
+            </div>
+          </div>
+
+          <!-- Chemistry Module 2 (Locked) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-chemistry">Chemistry</span>
+                <span class="badge badge-locked" id="badge-chem2">LOCKED</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">Organic Mechanisms</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                Electrophilic and Nucleophilic Addition/Substitution.
+              </p>
+            </div>
+            <div id="actions-chem2">
+              <button class="btn btn-secondary" onclick="openSubscriptionModal()">
+                <i class="fa-solid fa-lock"></i> Unlock Module
+              </button>
+            </div>
+          </div>
+
+          <!-- Physics Module 3 (Locked) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-physics">Physics</span>
+                <span class="badge badge-locked" id="badge-phys3">LOCKED</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">Circular & Gravitational Motion</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                Centripetal Acceleration, Gravitational Fields & Orbits.
+              </p>
+            </div>
+            <div id="actions-phys3">
+              <button class="btn btn-secondary" onclick="openSubscriptionModal()">
+                <i class="fa-solid fa-lock"></i> Unlock Module
+              </button>
+            </div>
+          </div>
+
+          <!-- Chemistry Module 3 (Locked) -->
+          <div class="resource-card">
+            <div>
+              <div class="resource-header">
+                <span class="subject-tag tag-chemistry">Chemistry</span>
+                <span class="badge badge-locked" id="badge-chem3">LOCKED</span>
+              </div>
+              <h4 style="margin-top: 0.6rem;">Ionic Equilibria & Buffers</h4>
+              <p style="font-size: 0.825rem; color: var(--gray-600); margin-top: 0.3rem;">
+                pH calculations, Ka, Kb, and Henderson-Hasselbalch equation.
+              </p>
+            </div>
+            <div id="actions-chem3">
+              <button class="btn btn-secondary" onclick="openSubscriptionModal()">
+                <i class="fa-solid fa-lock"></i> Unlock Module
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         VIEW 2: TUTORING BOOKING SYSTEM
+         ========================================================================== -->
+    <div id="view-booking" class="view-panel">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-calendar-check"></i> Book Personal Tuition Session
+        </div>
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+          Reserve a 1-on-1 practical diagnostic or topic breakdown session with an instructor.
+        </p>
+
+        <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+          <div class="form-group">
+            <label>Full Student Name</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="book-name" 
+              required 
+              placeholder="Enter student name"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Subject Topic Focus</label>
+            <select class="form-control" id="book-subject" required>
+              <option value="A-Level Physics (Paper 1 & 2)">A-Level Physics (Paper 1 & 2)</option>
+              <option value="A-Level Physics (Practical Prep)">A-Level Physics (Practical Prep)</option>
+              <option value="A-Level Chemistry (Organic Focus)">A-Level Chemistry (Organic Focus)</option>
+              <option value="A-Level Chemistry (Physical & In-organic)">A-Level Chemistry (Physical & In-organic)</option>
+            </select>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Preferred Session Date</label>
+              <input type="date" class="form-control" id="book-date" required>
+            </div>
+
+            <div class="form-group">
+              <label>Preferred Time Slot</label>
+              <select class="form-control" id="book-time" required>
+                <option value="09:00 AM - 10:30 AM">09:00 AM - 10:30 AM</option>
+                <option value="11:00 AM - 12:30 PM">11:00 AM - 12:30 PM</option>
+                <option value="02:00 PM - 03:30 PM">02:00 PM - 03:30 PM</option>
+                <option value="04:00 PM - 05:30 PM">04:00 PM - 05:30 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Special Notes / Specific Topics Needed</label>
+            <textarea 
+              class="form-control" 
+              id="book-notes" 
+              rows="3" 
+              placeholder="e.g. Need specific help on Kirchhoff's laws circuit equations..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-paper-plane"></i> Confirm Booking Request
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         VIEW 3: PROFILE & ACCOUNT CONTROL
+         ========================================================================== -->
+    <div id="view-profile" class="view-panel">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-user-gear"></i> Account Settings & Subscriptions
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <p style="margin-bottom: 0.4rem;">
+            <strong>Account Name:</strong> <span id="profile-status">Guest Account</span>
+          </p>
+          <p style="margin-bottom: 0.4rem;">
+            <strong>Subscription Access:</strong> <span id="profile-sub">Free Tier</span>
+          </p>
+          <p style="margin-bottom: 0.4rem;">
+            <strong>Registered Platform:</strong> StepUp Science Web Application
+          </p>
+        </div>
+
+        <div style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+          <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Local Data Management</h4>
+          <button class="btn btn-secondary" onclick="resetLocalData()">
+            <i class="fa-solid fa-arrows-rotate"></i> Reset Saved Local Profile
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       BOTTOM NAVIGATION BAR
+       ========================================================================== -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('home', this)">
+      <i class="fa-solid fa-house"></i>
+      <span>Modules</span>
+    </div>
+    <div class="nav-item" onclick="switchView('booking', this)">
+      <i class="fa-solid fa-calendar-plus"></i>
+      <span>Book Session</span>
+    </div>
+    <div class="nav-item" onclick="switchView('profile', this)">
+      <i class="fa-solid fa-user"></i>
+      <span>Profile</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MOBILE PAYMENT MODAL (PAYNOW)
+       ========================================================================== -->
+  <div class="modal-overlay" id="sub-modal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 0.5rem; color: var(--dark); display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-mobile-screen-button" style="color: var(--secondary);"></i> Mobile Money Checkout
+      </h3>
+      <p style="font-size: 0.825rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+        Enter your payment details below to initiate an automated EcoCash or OneMoney USSD checkout prompt.
+      </p>
+
+      <div class="form-group">
+        <label>Student Name</label>
+        <input 
+          type="text" 
+          id="pay-name" 
+          class="form-control" 
+          placeholder="e.g. Student Name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Mobile Money Phone Number</label>
+        <input 
+          type="text" 
+          id="pay-phone" 
+          class="form-control" 
+          placeholder="077... or 071..."
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Select Access Plan</label>
+        <select id="pay-tier" class="form-control">
+          <option value="1">Tier 1: Basic Module Access ($5/mo)</option>
+          <option value="2">Tier 2: Premium All-Access + Worked Past Papers ($10/mo)</option>
+        </select>
+      </div>
+
+      <button class="btn btn-purple" onclick="processPaynowGateway()">
+        <i class="fa-solid fa-lock"></i> Authorize & Pay via Paynow
+      </button>
+      <button class="btn btn-secondary" style="margin-top: 0.6rem;" onclick="closeSubscriptionModal()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       APPLICATION LOGIC & CLIENT SCRIPT
+       ========================================================================== -->
+  
+  <script>
+    const APP_CONFIG = {
+      SUPABASE_URL: 'https://phiyuvpwvaaarnockyqm.supabase.co/rest/v1/',
+      SUPABASE_ANON_KEY: 'sb_publishable_NFYozwSjCZ1gB8FONH8FhA_r-MJCAq6',
+      STORAGE_BUCKET: 'protected-content',
+      PAYMENT_FUNCTION_URL: '/.netlify/functions/paynow-pay'
+    };
+
+    const TIER_ORDER = { 'Free': 0, 'Tier 1': 1, 'Tier 2': 2 };
+    const FALLBACK_MODULES = [
+      { id: 'phys1', title: 'Kinematics & Dynamics', subject: 'Physics', description: 'Projectiles, Linear motion, Newton\'s Laws, and Vectors.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
+      { id: 'chem1', title: 'Atomic Structure & Bonding', subject: 'Chemistry', description: 'Orbitals, Ionization Energies, and Hybridization.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
+      { id: 'phys2', title: 'DC Circuits & Resistance', subject: 'Physics', description: 'Kirchhoff\'s Laws, Internal Resistance, Potential Dividers.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
+      { id: 'chem2', title: 'Organic Mechanisms', subject: 'Chemistry', description: 'Electrophilic and Nucleophilic Addition/Substitution.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
+      { id: 'phys3', title: 'Circular & Gravitational Motion', subject: 'Physics', description: 'Centripetal Acceleration, Gravitational Fields & Orbits.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' },
+      { id: 'chem3', title: 'Ionic Equilibria & Buffers', subject: 'Chemistry', description: 'pH calculations, Ka, Kb, and Henderson-Hasselbalch equation.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' }
+    ];
+
+    let supabaseClient = null;
+    let currentSession = null;
+    let currentProfile = null;
+    let currentModules = [...FALLBACK_MODULES];
+
+    function isConfigured() {
+      return !APP_CONFIG.SUPABASE_URL.includes('YOUR_PROJECT') && !APP_CONFIG.SUPABASE_ANON_KEY.includes('YOUR_PUBLIC_ANON_KEY');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function normalizeTier(value) {
+      if (!value) return 'Free';
+      const text = String(value).trim().toLowerCase();
+      if (text === 'tier 2' || text === '2' || text === 'premium') return 'Tier 2';
+      if (text === 'tier 1' || text === '1' || text === 'basic') return 'Tier 1';
+      return 'Free';
+    }
+
+    function tierRank(value) {
+      return TIER_ORDER[normalizeTier(value)] ?? 0;
+    }
+
+    function currentTier() {
+      return normalizeTier(currentProfile?.access_tier || 'Free');
+    }
+
+    function canAccess(requiredTier) {
+      return tierRank(currentTier()) >= tierRank(requiredTier || 'Free');
+    }
+
+    function showConfigNotice() {
+      const container = document.querySelector('.container');
+      if (!container || document.getElementById('config-notice')) return;
+      const notice = document.createElement('div');
+      notice.id = 'config-notice';
+      notice.className = 'card';
+      notice.style.border = '1px solid #f59e0b';
+      notice.style.background = '#fffbeb';
+      notice.style.marginBottom = '1rem';
+      notice.innerHTML = `
+        <div class="card-title"><i class="fa-solid fa-triangle-exclamation"></i> Configuration required</div>
+        <p style="font-size:0.9rem;color:#92400e;">
+          Replace the placeholder Supabase URL / anon key in <strong>index.html</strong> and deploy the Netlify functions before testing locked content, bookings and payments.
+        </p>`;
+      container.prepend(notice);
+    }
+
+    function ensureEnhancements() {
+      const profileCard = document.querySelector('#view-profile .card');
+      if (profileCard && !document.getElementById('auth-email')) {
+        const section = document.createElement('div');
+        section.innerHTML = `
+          <div style="border-top:1px solid var(--gray-200);padding-top:1rem;margin-top:1rem;">
+            <h4 style="margin-bottom:0.75rem;font-size:0.95rem;">Secure account access</h4>
+            <p style="font-size:0.85rem;color:var(--gray-600);margin-bottom:0.85rem;">
+              Students must sign in before paid modules are opened. Access is now checked against the backend profile tier instead of localStorage.
+            </p>
+            <div class="form-group">
+              <label>Email address</label>
+              <input type="email" id="auth-email" class="form-control" placeholder="student@example.com">
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="auth-password" class="form-control" placeholder="Enter password">
+            </div>
+            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+              <button class="btn btn-primary" type="button" onclick="signInStudent()"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+              <button class="btn btn-purple" type="button" onclick="signUpStudent()"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+              <button class="btn btn-secondary" type="button" onclick="refreshAccessFromDatabase()"><i class="fa-solid fa-rotate"></i> Refresh Access</button>
+              <button class="btn btn-secondary" type="button" onclick="signOutStudent()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--gray-200);padding-top:1rem;margin-top:1rem;">
+            <h4 style="margin-bottom:0.75rem;font-size:0.95rem;">Performance summary</h4>
+            <p id="performance-summary" style="font-size:0.9rem;color:var(--gray-700);">Sign in to see quiz performance and progress tracking.</p>
+          </div>
+          <div style="border-top:1px solid var(--gray-200);padding-top:1rem;margin-top:1rem;">
+            <h4 style="margin-bottom:0.75rem;font-size:0.95rem;">Student suggestion box</h4>
+            <div class="form-group">
+              <label>Your suggestion</label>
+              <textarea id="suggestion-message" class="form-control" rows="3" placeholder="Suggest a topic, video, document, quiz or website improvement"></textarea>
+            </div>
+            <button class="btn btn-primary" type="button" onclick="submitSuggestion()"><i class="fa-solid fa-paper-plane"></i> Send Suggestion</button>
+          </div>`;
+        profileCard.appendChild(section);
+      }
+
+      if (!document.getElementById('viewer-modal')) {
+        const modal = document.createElement('div');
+        modal.id = 'viewer-modal';
+        modal.className = 'modal-overlay';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+          <div class="modal-content" style="max-width:960px;width:min(96vw,960px);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:0.75rem;">
+              <h3 id="viewer-title" style="margin:0;color:var(--dark);">Content viewer</h3>
+              <button class="btn btn-secondary" type="button" onclick="closeViewerModal()">Close</button>
+            </div>
+            <p style="font-size:0.8rem;color:var(--gray-600);margin-bottom:0.75rem;">Preview only. Browser-side restrictions reduce casual downloading, but no website can guarantee perfect non-downloadability once content is visible in a user browser.</p>
+            <div id="viewer-frame-wrap" style="width:100%;min-height:70vh;background:#0f172a;border-radius:12px;overflow:hidden;"></div>
+          </div>`;
+        document.body.appendChild(modal);
+      }
+    }
+
+    function initSupabase() {
+      if (!window.supabase || !isConfigured()) {
+        showConfigNotice();
+        return;
+      }
+      supabaseClient = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON_KEY);
+    }
+
+    async function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try { await navigator.serviceWorker.register('./sw.js'); } catch (err) { console.warn('SW registration failed', err); }
+      }
+    }
+
+    function openSubscriptionModal() {
+      document.getElementById('sub-modal').style.display = 'flex';
+    }
+
+    function closeSubscriptionModal() {
+      document.getElementById('sub-modal').style.display = 'none';
+    }
+
+    function closeViewerModal() {
+      const modal = document.getElementById('viewer-modal');
+      const wrap = document.getElementById('viewer-frame-wrap');
+      if (wrap) wrap.innerHTML = '';
+      if (modal) modal.style.display = 'none';
+    }
+
+    function renderStaticTierState() {
+      document.getElementById('user-role-display').innerText = currentTier() === 'Free' ? 'Free Tier' : `${currentTier()} Active`;
+      document.getElementById('sub-status-text').innerText = currentTier() === 'Free'
+        ? 'You are currently on Free Access. Sign in and subscribe to unlock protected videos, documents and quizzes.'
+        : `${currentTier()} is active for this account. Access is verified from your backend profile, not from local browser storage.`;
+      document.getElementById('profile-sub').innerText = currentTier();
+      document.getElementById('profile-status').innerText = currentProfile?.full_name || currentSession?.user?.email || 'Guest Account';
+      document.getElementById('user-name-display').innerText = currentProfile?.full_name || 'Guest Student';
+    }
+
+    function getSubjectClass(subject) {
+      return String(subject).toLowerCase().includes('chem') ? 'tag-chemistry' : 'tag-physics';
+    }
+
+    function badgeClassForTier(tier) {
+      return normalizeTier(tier) === 'Free' ? 'badge-free' : (canAccess(tier) ? 'badge-free' : 'badge-locked');
+    }
+
+    function badgeLabelForTier(tier) {
+      return normalizeTier(tier) === 'Free' ? 'FREE' : (canAccess(tier) ? 'UNLOCKED' : 'LOCKED');
+    }
+
+    function moduleActionButtons(module) {
+      if (canAccess(module.required_tier)) {
+        return `<button class="btn btn-primary" type="button" onclick="openModule('${escapeHtml(module.id)}')"><i class="fa-solid ${module.kind === 'video' ? 'fa-circle-play' : 'fa-file-pdf'}"></i> Open ${module.kind === 'video' ? 'Video' : 'Notes'}</button>`;
+      }
+      return `<button class="btn btn-secondary" type="button" onclick="openSubscriptionModal()"><i class="fa-solid fa-lock"></i> Unlock Module</button>`;
+    }
+
+    function renderModules() {
+      const grid = document.querySelector('#view-home .grid-2');
+      if (!grid) return;
+      grid.innerHTML = currentModules.map((module) => `
+        <div class="resource-card">
+          <div>
+            <div class="resource-header">
+              <span class="subject-tag ${getSubjectClass(module.subject)}">${escapeHtml(module.subject || 'Science')}</span>
+              <span class="badge ${badgeClassForTier(module.required_tier)}">${badgeLabelForTier(module.required_tier)}</span>
+            </div>
+            <h4 style="margin-top:0.6rem;">${escapeHtml(module.title)}</h4>
+            <p style="font-size:0.825rem;color:var(--gray-600);margin-top:0.3rem;">${escapeHtml(module.description || '')}</p>
+            <p style="font-size:0.75rem;color:var(--gray-500);margin-top:0.45rem;">Required access: ${escapeHtml(normalizeTier(module.required_tier))}</p>
+          </div>
+          <div>${moduleActionButtons(module)}</div>
+        </div>`).join('');
+    }
+
+    async function refreshStudentContext() {
+      currentSession = null;
+      currentProfile = null;
+      if (!supabaseClient) {
+        renderStaticTierState();
+        renderModules();
+        return;
+      }
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      currentSession = session || null;
+
+      if (currentSession?.user) {
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('id, full_name, phone, role, access_tier, access_expires_at')
+          .eq('id', currentSession.user.id)
+          .maybeSingle();
+
+        if (profile) currentProfile = profile;
+      }
+
+      renderStaticTierState();
+      renderModules();
+      await loadPerformanceSummary();
+    }
+
+    async function loadModules() {
+      if (!supabaseClient) {
+        renderModules();
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('modules')
+        .select('id, title, subject, description, required_tier, kind, file_path, public_url, is_published')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      if (!error && Array.isArray(data) && data.length) {
+        currentModules = data.map((item) => ({ ...item, required_tier: normalizeTier(item.required_tier) }));
+      }
+      renderModules();
+    }
+
+    async function signUpStudent() {
+      if (!supabaseClient) return alert('Add your Supabase project URL and anon key first.');
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      const fullName = document.getElementById('pay-name').value.trim() || document.getElementById('book-name')?.value.trim() || email.split('@')[0];
+      if (!email || !password) return alert('Enter email and password to create an account.');
+
+      const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+      if (error) return alert(error.message);
+      if (data.user?.id) {
+        await supabaseClient.from('profiles').upsert({ id: data.user.id, full_name: fullName, access_tier: 'Free', role: 'student' });
+      }
+      alert('Account created. Check your email if confirmation is enabled, then sign in.');
+      await refreshStudentContext();
+    }
+
+    async function signInStudent() {
+      if (!supabaseClient) return alert('Add your Supabase project URL and anon key first.');
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      if (!email || !password) return alert('Enter email and password to sign in.');
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      await refreshStudentContext();
+      await loadModules();
+      alert('Signed in successfully.');
+    }
+
+    async function signOutStudent() {
+      if (!supabaseClient) {
+        currentSession = null;
+        currentProfile = null;
+        renderStaticTierState();
+        renderModules();
+        return;
+      }
+      await supabaseClient.auth.signOut();
+      currentSession = null;
+      currentProfile = null;
+      renderStaticTierState();
+      renderModules();
+      document.getElementById('performance-summary').innerText = 'Signed out. Sign in to see quiz performance and progress tracking.';
+    }
+
+    async function refreshAccessFromDatabase() {
+      await refreshStudentContext();
+      await loadModules();
+      alert(`Access refreshed. Current tier: ${currentTier()}.`);
+    }
+
+    async function getModuleUrl(module) {
+      if (module.public_url) return module.public_url;
+      if (!supabaseClient || !currentSession?.user || !module.file_path) return null;
+
+      const { data, error } = await supabaseClient.storage
+        .from(APP_CONFIG.STORAGE_BUCKET)
+        .createSignedUrl(module.file_path, 60 * 15, { download: false });
+
+      if (error) {
+        console.error(error);
+        return null;
+      }
+      return data?.signedUrl || null;
+    }
+
+    async function openModule(moduleId) {
+      const module = currentModules.find((item) => String(item.id) === String(moduleId));
+      if (!module) return;
+
+      if (!canAccess(module.required_tier)) {
+        openSubscriptionModal();
+        return alert(`This module requires ${normalizeTier(module.required_tier)} access.`);
+      }
+
+      const url = await getModuleUrl(module);
+      if (!url) {
+        return alert(module.preview_note || 'This module does not have a file attached yet, or you need to sign in before opening protected content.');
+      }
+
+      const wrap = document.getElementById('viewer-frame-wrap');
+      const title = document.getElementById('viewer-title');
+      const modal = document.getElementById('viewer-modal');
+      if (!wrap || !title || !modal) return;
+
+      title.innerText = `${module.title} (${module.subject})`;
+      if (module.kind === 'video') {
+        wrap.innerHTML = `<video controls controlsList="nodownload noplaybackrate" style="width:100%;height:70vh;background:#000;" oncontextmenu="return false;"><source src="${url}" type="video/mp4"></video>`;
+      } else if (module.kind === 'image') {
+        wrap.innerHTML = `<img src="${url}" alt="${escapeHtml(module.title)}" style="width:100%;height:70vh;object-fit:contain;background:#000;" oncontextmenu="return false;">`;
+      } else {
+        wrap.innerHTML = `<iframe src="${url}#toolbar=0&navpanes=0&scrollbar=1" style="width:100%;height:70vh;border:0;background:#fff;" sandbox="allow-scripts allow-same-origin"></iframe>`;
+      }
+      modal.style.display = 'flex';
+    }
+
+    async function processPaynowGateway() {
+      if (!supabaseClient || !isConfigured()) return alert('Configure Supabase and deploy the payment function first.');
+      if (!currentSession?.user) return alert('Students must sign in before paying for locked content.');
+
+      const name = document.getElementById('pay-name').value.trim();
+      const phone = document.getElementById('pay-phone').value.trim();
+      const tierValue = document.getElementById('pay-tier').value;
+      if (!name || !phone) return alert('Please fill out your name and phone number.');
+
+      const plan = tierValue === '2'
+        ? { plan: 'tier2', amount: 10, tier: 'Tier 2' }
+        : { plan: 'tier1', amount: 5, tier: 'Tier 1' };
+
+      const res = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: plan.plan,
+          amount: plan.amount,
+          phone,
+          method: 'ecocash',
+          userId: currentSession.user.id,
+          studentName: name,
+          studentEmail: currentSession.user.email
+        })
+      });
+
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload.success) {
+        return alert(payload.error || 'Payment request could not be started.');
+      }
+
+      alert(`Payment request sent to ${phone}. Once the payment is approved on the phone, click “Refresh Access” in your profile to load the activated tier.`);
+      closeSubscriptionModal();
+    }
+
+    async function handleBookingSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('book-name').value.trim();
+      const subject = document.getElementById('book-subject').value;
+      const date = document.getElementById('book-date').value;
+      const time = document.getElementById('book-time').value;
+      const notes = document.getElementById('book-notes').value.trim();
+
+      if (!name || !subject || !date || !time) return alert('Please complete the booking form.');
+
+      if (!supabaseClient) {
+        return alert(`Booking captured locally only. Configure Supabase to save this request.
+
+Student: ${name}
+Module: ${subject}
+Schedule: ${date} at ${time}`);
+      }
+
+      const { error } = await supabaseClient.from('bookings').insert({
+        student_id: currentSession?.user?.id || null,
+        student_name: name,
+        subject_focus: subject,
+        requested_date: date,
+        requested_time: time,
+        notes,
+        status: 'pending'
+      });
+
+      if (error) return alert(error.message);
+      alert('Booking request submitted successfully.');
+      document.getElementById('booking-form').reset();
+    }
+
+    async function submitSuggestion() {
+      const message = document.getElementById('suggestion-message').value.trim();
+      if (!message) return alert('Type a suggestion first.');
+      if (!supabaseClient) return alert('Configure Supabase first so suggestions can be stored.');
+
+      const { error } = await supabaseClient.from('suggestions').insert({
+        student_id: currentSession?.user?.id || null,
+        student_name: currentProfile?.full_name || currentSession?.user?.email || 'Guest Student',
+        message,
+        status: 'new'
+      });
+
+      if (error) return alert(error.message);
+      document.getElementById('suggestion-message').value = '';
+      alert('Suggestion sent.');
+    }
+
+    async function loadPerformanceSummary() {
+      const target = document.getElementById('performance-summary');
+      if (!target) return;
+      if (!supabaseClient || !currentSession?.user) {
+        target.innerText = 'Sign in to see quiz performance and progress tracking.';
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('quiz_results')
+        .select('score, total, subject, topic, taken_at')
+        .eq('student_id', currentSession.user.id)
+        .order('taken_at', { ascending: false });
+
+      if (error || !data || !data.length) {
+        target.innerText = 'No quiz attempts recorded yet.';
+        return;
+      }
+
+      const attempts = data.length;
+      const avgPct = Math.round(data.reduce((sum, row) => sum + ((Number(row.score || 0) / Math.max(Number(row.total || 1), 1)) * 100), 0) / attempts);
+      const last = data[0];
+      target.innerText = `Attempts: ${attempts} · Average score: ${avgPct}% · Latest topic: ${last.topic || last.subject || 'Revision activity'}`;
+    }
+
+    function resetLocalData() {
+      document.getElementById('auth-email') && (document.getElementById('auth-email').value = '');
+      document.getElementById('auth-password') && (document.getElementById('auth-password').value = '');
+      alert('Browser-only form inputs were cleared. Subscription access is now stored on the backend, not in localStorage.');
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      ensureEnhancements();
+      initSupabase();
+      await registerServiceWorker();
+      await refreshStudentContext();
+      await loadModules();
+    });
+  </script>
+
+</body>
+</html>
