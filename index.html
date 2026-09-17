@@ -16,10 +16,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-      nav *, button * {
-    pointer-events: none;
+  nav *, button * { 
+    pointer-events: none; 
+  }
+  nav, .bottom-nav, footer { 
+    position: relative;
+    z-index: 99999 !important; 
+    pointer-events: auto !important;
   }
   </style>
+  
     /* ==========================================================================
        1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
        ========================================================================== */
