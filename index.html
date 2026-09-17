@@ -1261,6 +1261,17 @@ Schedule: ${date} at ${time}`);
       document.getElementById('auth-password') && (document.getElementById('auth-password').value = '');
       alert('Browser-only form inputs were cleared. Subscription access is now stored on the backend, not in localStorage.');
     }
+    function switchView(viewName, targetElem) {
+      document.querySelectorAll('.view-panel').forEach((panel) => panel.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach((item) => item.classList.remove('active'));
+
+  const selectedView = document.getElementById(`view-${viewName}`);
+  if (selectedView) selectedView.classList.add('active');
+  if (targetElem) targetElem.classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 
     window.addEventListener('DOMContentLoaded', async () => {
       ensureEnhancements();
