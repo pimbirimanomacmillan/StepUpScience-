@@ -16,15 +16,32 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-  nav *, button * { 
-    pointer-events: none; 
+  /* Prevents icons from swallowing clicks */
+  .bottom-nav *, .nav-item * {
+    pointer-events: none;
   }
-  nav, .bottom-nav, footer { 
-    position: relative;
-    z-index: 99999 !important; 
+
+  /* Ensures the bottom nav sits above all other page layers */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999 !important;
     pointer-events: auto !important;
   }
+
+  /* Hide all panels by default */
+  .view-panel {
+    display: none !important;
+  }
+
+  /* Show active panel when clicked */
+  .view-panel.active {
+    display: block !important;
+  }
   </style>
+  
   
     /* ==========================================================================
        1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
