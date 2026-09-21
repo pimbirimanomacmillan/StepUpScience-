@@ -10,9 +10,12 @@
 
   <!-- External Stylesheets & Libraries -->
   <link 
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-    rel="stylesheet"
-  >
+  rel="stylesheet" 
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  crossorigin="anonymous" 
+  referrerpolicy="no-referrer"
+/>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -1006,6 +1009,7 @@
     function renderModules() {
   const grid = document.querySelector('#view-modules .grid-2') || document.querySelector('#view-home .grid-2');
   if (!grid) return;
+
   grid.innerHTML = currentModules.map((module) => `
     <div class="resource-card">
       <div>
@@ -1019,8 +1023,7 @@
       </div>
       <div>${moduleActionButtons(module)}</div>
     </div>`).join('');
-    }
-    
+} 
 
     async function refreshStudentContext() {
       currentSession = null;
