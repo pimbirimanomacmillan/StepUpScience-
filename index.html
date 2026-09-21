@@ -30,16 +30,6 @@
     z-index: 99999 !important;
     pointer-events: auto !important;
   }
-
-  /* Hide all panels by default */
-  .view-panel {
-    display: none;
-  }
-
-  /* Show active panel when clicked */
-  .view-panel.active {
-    display: block !important;
-  }
   
     /* ==========================================================================
        1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
@@ -189,7 +179,7 @@
     }
 
     .view-panel.active {
-      display: block;
+      display: block !important;
       opacity: 1;
     }
 
@@ -759,17 +749,17 @@
        ========================================================================== -->
 
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchView('view-modules', this)">
+    <div class="nav-item active" onclick="switchView('modules', this)">
       <i class="fa-solid fa-house"></i>
       <span>Modules</span>
     </div>
 
-    <div class="nav-item" onclick="switchView('view-booking', this)">
+    <div class="nav-item" onclick="switchView('booking', this)">
       <i class="fa-solid fa-calendar-plus"></i>
       <span>Book Session</span>
     </div>
 
-    <div class="nav-item" onclick="switchView('view-profile', this)">
+    <div class="nav-item" onclick="switchView('profile', this)">
       <i class="fa-solid fa-user"></i>
       <span>Profile</span>
     </div>
@@ -1014,22 +1004,23 @@
     }
 
     function renderModules() {
-      const grid = document.querySelector('#view-home .grid-2');
-      if (!grid) return;
-      grid.innerHTML = currentModules.map((module) => `
-        <div class="resource-card">
-          <div>
-            <div class="resource-header">
-              <span class="subject-tag ${getSubjectClass(module.subject)}">${escapeHtml(module.subject || 'Science')}</span>
-              <span class="badge ${badgeClassForTier(module.required_tier)}">${badgeLabelForTier(module.required_tier)}</span>
-            </div>
-            <h4 style="margin-top:0.6rem;">${escapeHtml(module.title)}</h4>
-            <p style="font-size:0.825rem;color:var(--gray-600);margin-top:0.3rem;">${escapeHtml(module.description || '')}</p>
-            <p style="font-size:0.75rem;color:var(--gray-500);margin-top:0.45rem;">Required access: ${escapeHtml(normalizeTier(module.required_tier))}</p>
-          </div>
-          <div>${moduleActionButtons(module)}</div>
-        </div>`).join('');
+  const grid = document.querySelector('#view-modules .grid-2') || document.querySelector('#view-home .grid-2');
+  if (!grid) return;
+  grid.innerHTML = currentModules.map((module) => `
+    <div class="resource-card">
+      <div>
+        <div class="resource-header">
+          <span class="subject-tag ${getSubjectClass(module.subject)}">${escapeHtml(module.subject || 'Science')}</span>
+          <span class="badge ${badgeClassForTier(module.required_tier)}">${badgeLabelForTier(module.required_tier)}</span>
+        </div>
+        <h4 style="margin-top:0.6rem;">${escapeHtml(module.title)}</h4>
+        <p style="font-size:0.825rem;color:var(--gray-600);margin-top:0.3rem;">${escapeHtml(module.description || '')}</p>
+        <p style="font-size:0.75rem;color:var(--gray-500);margin-top:0.45rem;">Required access: ${escapeHtml(normalizeTier(module.required_tier))}</p>
+      </div>
+      <div>${moduleActionButtons(module)}</div>
+    </div>`).join('');
     }
+    
 
     async function refreshStudentContext() {
       currentSession = null;
