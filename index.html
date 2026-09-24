@@ -11,10 +11,9 @@
   <!-- External Stylesheets & Libraries -->
   <link 
   rel="stylesheet" 
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  crossorigin="anonymous" 
-  referrerpolicy="no-referrer"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 />
+
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -486,7 +485,7 @@
        ========================================================================== -->
   <header>
     <div class="brand-logo">
-      <i class="fa-solid fa-atom"></i> StepUp Science
+      <i class="fas fa-atom"></i> StepUp Science
     </div>
     <div class="subtitle">
       A-Level Physics & Chemistry Tuition Portal
@@ -752,21 +751,22 @@
        ========================================================================== -->
 
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchView('modules', this)">
-      <i class="fa-solid fa-house"></i>
-      <span>Modules</span>
-    </div>
-
-    <div class="nav-item" onclick="switchView('booking', this)">
-      <i class="fa-solid fa-calendar-plus"></i>
-      <span>Book Session</span>
-    </div>
-
-    <div class="nav-item" onclick="switchView('profile', this)">
-      <i class="fa-solid fa-user"></i>
-      <span>Profile</span>
-    </div>
+  <div class="nav-item active" onclick="switchView('modules', this)">
+    <i class="fas fa-house-user"></i>
+    <span>Modules</span>
   </div>
+
+  <div class="nav-item" onclick="switchView('booking', this)">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Book Session</span>
+  </div>
+
+  <div class="nav-item" onclick="switchView('profile', this)">
+    <i class="fas fa-user"></i>
+    <span>Profile</span>
+  </div>
+</div>
+
 
 
   <!-- ==========================================================================
