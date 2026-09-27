@@ -9,7 +9,6 @@
 
 
   <!-- External Stylesheets & Libraries -->
-<link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
@@ -19,16 +18,24 @@
   .bottom-nav *, .nav-item * {
     pointer-events: none;
   }
-
+  
   /* Ensures the bottom nav sits above all other page layers */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-  }
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+/* Styles the emojis for bottom navigation */
+.nav-icon {
+  font-size: 1.25rem;
+  display: block;
+  margin-bottom: 2px;
+}
+
   
     /* ==========================================================================
        1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
@@ -482,13 +489,13 @@
        ========================================================================== -->
   <header>
     <div class="brand-logo">
-      <i class="fas fa-atom"></i> StepUp Science
+      ⚛️ StepUp Science
     </div>
     <div class="subtitle">
       A-Level Physics & Chemistry Tuition Portal
     </div>
     <div class="user-badge" id="user-status-bar">
-      <i class="fa-solid fa-circle-user"></i> 
+      👤
       <span id="user-name-display">Guest Student</span> | 
       <span id="user-role-display">Free Access</span>
     </div>
@@ -508,7 +515,7 @@
       <!-- Upgrade Subscription Banner -->
       <div class="card banner-card">
         <div class="card-title">
-          <i class="fa-solid fa-graduation-cap"></i> Complete A-Level Syllabus Unlocked
+          🎓 Complete A-Level Syllabus Unlocked
         </div>
         <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1.25rem;" id="sub-status-text">
           You are currently utilizing Free Access. Upgrade to unlock full access to paper solutions, worked chemistry mechanisms, and revision quizzes.
@@ -521,7 +528,7 @@
       <!-- Module Resources Section -->
       <div class="card">
         <div class="card-title">
-          <i class="fa-solid fa-book-open"></i> A-Level Study Modules
+          📖 A-Level Study Modules
         </div>
         
         <div class="grid-2">
@@ -540,7 +547,7 @@
             </div>
             <div>
               <button class="btn btn-primary" onclick="alert('Opening Mechanics & Kinematics Notes...')">
-                <i class="fa-solid fa-file-pdf"></i> Read Notes
+                📝 Read Notes
               </button>
             </div>
           </div>
@@ -559,7 +566,7 @@
             </div>
             <div>
               <button class="btn btn-primary" onclick="alert('Opening Atomic Structure Notes...')">
-                <i class="fa-solid fa-file-pdf"></i> Read Notes
+                📝 Read Notes
               </button>
             </div>
           </div>
@@ -578,7 +585,7 @@
             </div>
             <div id="actions-phys2">
               <button class="btn btn-secondary" onclick="openSubscriptionModal()">
-                <i class="fa-solid fa-lock"></i> Unlock Module
+                🔒 Unlock Module
               </button>
             </div>
           </div>
@@ -597,7 +604,7 @@
             </div>
             <div id="actions-chem2">
               <button class="btn btn-secondary" onclick="openSubscriptionModal()">
-                <i class="fa-solid fa-lock"></i> Unlock Module
+                🔒 Unlock Module
               </button>
             </div>
           </div>
@@ -616,7 +623,7 @@
             </div>
             <div id="actions-phys3">
               <button class="btn btn-secondary" onclick="openSubscriptionModal()">
-                <i class="fa-solid fa-lock"></i> Unlock Module
+                🔒 Unlock Module
               </button>
             </div>
           </div>
@@ -635,7 +642,7 @@
             </div>
             <div id="actions-chem3">
               <button class="btn btn-secondary" onclick="openSubscriptionModal()">
-                <i class="fa-solid fa-lock"></i> Unlock Module
+                🔒 Unlock Module
               </button>
             </div>
           </div>
@@ -650,7 +657,7 @@
     <div id="view-booking" class="view-panel">
       <div class="card">
         <div class="card-title">
-          <i class="fa-solid fa-calendar-check"></i> Book Personal Tuition Session
+          🗓️ Book Personal Tuition Session
         </div>
         <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
           Reserve a 1-on-1 practical diagnostic or topic breakdown session with an instructor.
@@ -706,7 +713,7 @@
           </div>
 
           <button type="submit" class="btn btn-primary">
-            <i class="fa-solid fa-paper-plane"></i> Confirm Booking Request
+            ✈️ Confirm Booking Request
           </button>
         </form>
       </div>
@@ -718,7 +725,7 @@
     <div id="view-profile" class="view-panel">
       <div class="card">
         <div class="card-title">
-          <i class="fa-solid fa-user-gear"></i> Account Settings & Subscriptions
+          ⚙️ Account Settings & Subscriptions
         </div>
         
         <div style="margin-bottom: 1.5rem;">
@@ -744,36 +751,36 @@
 
   </div>
 
-  <!-- ==========================================================================
+    <!-- ====================================================================
        BOTTOM NAVIGATION BAR
-       ========================================================================== -->
+  ==================================================================== -->
 
-  <div class="bottom-nav">
-  <div class="nav-item active" onclick="switchView('modules', this)">
-    <i class="fa-solid fa-book-open"></i>
-    <span>Modules</span>
-  </div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('modules', this)">
+      <span class="nav-icon">📚</span>
+      <span>Modules</span>
+    </div>
 
-  <div class="nav-item" onclick="switchView('booking', this)">
-    <i class="fa-solid fa-calendar-check"></i>
-    <span>Book Session</span>
-  </div>
+    <div class="nav-item" onclick="switchView('booking', this)">
+      <span class="nav-icon">📅</span>
+      <span>Book Session</span>
+    </div>
 
-  <div class="nav-item" onclick="switchView('profile', this)">
-    <i class="fa-solid fa-user"></i>
-    <span>Profile</span>
-  </div>
-</div>
+    <div class="nav-item" onclick="switchView('profile', this)">
+      <span class="nav-icon">👤</span>
+      <span>Profile</span>
+    </div>
+  </nav>
 
 
 
-  <!-- ==========================================================================
+<!-- ==========================================================================
        MOBILE PAYMENT MODAL (PAYNOW)
        ========================================================================== -->
   <div class="modal-overlay" id="sub-modal">
     <div class="modal-content">
       <h3 style="margin-bottom: 0.5rem; color: var(--dark); display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-mobile-screen-button" style="color: var(--secondary);"></i> Mobile Money Checkout
+        📱 Mobile Money Checkout
       </h3>
       <p style="font-size: 0.825rem; color: var(--gray-600); margin-bottom: 1.25rem;">
         Enter your payment details below to initiate an automated EcoCash or OneMoney USSD checkout prompt.
@@ -808,7 +815,7 @@
       </div>
 
       <button class="btn btn-purple" onclick="processPaynowGateway()">
-        <i class="fa-solid fa-lock"></i> Authorize & Pay via Paynow
+        🔒 Authorize & Pay via Paynow
       </button>
       <button class="btn btn-secondary" style="margin-top: 0.6rem;" onclick="closeSubscriptionModal()">
         Cancel
