@@ -1096,36 +1096,41 @@ async function subscribeToSubject(level, subject, price) {
     return;
   }
 
+  // 2. Prompt for mobile money phone number
+  const phone = prompt('Enter your EcoCash or OneMoney number (e.g. 0771234567):');
+  if (!phone) return;
+
   const subjectKey = `${level} ${subject}`;
 
   try {
-    // 2. Call Netlify serverless function to create Paynow transaction
+    // 3. Call Netlify function to send mobile money push prompt
     const response = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: currentSession.user.email,
-        amount: price,
+        userId: currentSession.user.id,
+        studentEmail: currentSession.user.email,
+        studentName: currentProfile.full_name || '',
+        phone: phone.trim(),
         subjectKey: subjectKey,
-        userId: currentSession.user.id
+        amount: price,
+        method: 'ecocash'
       })
     });
 
     const data = await response.json();
 
-    // 3. Redirect to Paynow payment page if successful
-    if (data.redirectUrl) {
-      window.location.href = data.redirectUrl;
+    // 4. Handle mobile payment initiation
+    if (data.success) {
+      alert(`Payment prompt sent to ${phone}!\n\nPlease enter your PIN on your phone to complete the $${price} payment for ${subjectKey}. Access will unlock automatically upon confirmation.`);
     } else {
       alert(data.error || 'Payment initialization failed. Please try again.');
     }
   } catch (err) {
-    alert('Error connecting to payment provider: ' + err.message);
+    alert('Error connecting to payment service: ' + err.message);
   }
 }
 
-      await loadPerformanceSummary();
-    }
 
     async function loadModules(level, subject) {
   if (!supabaseClient) {
