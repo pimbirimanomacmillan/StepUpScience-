@@ -1075,23 +1075,31 @@
       await loadPerformanceSummary();
     }
 
-    async function loadModules() {
-      if (!supabaseClient) {
-        renderModules();
-        return;
-      }
+    async function loadModules(level, subject) {
+  if (!supabaseClient) {
+    renderModules();
+    return;
+  }
 
-      const { data, error } = await supabaseClient
-        .from('modules')
-        .select('id, title, subject, description, required_tier, kind, file_path, public_url, is_published')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
+  let query = supabaseClient
+    .from('modules')
+    .select('id, title, subject, level, description, required_tier, kind, file_path, public_url, is_published')
+    .eq('is_published', true);
 
-      if (!error && Array.isArray(data) && data.length) {
-        currentModules = data.map((item) => ({ ...item, required_tier: normalizeTier(item.required_tier) }));
-      }
-      renderModules();
-    }
+  if (level) query = query.eq('level', level);
+  if (subject) query = query.eq('subject', subject);
+
+  const { data, error } = await query.order('created_at', { ascending: false });
+
+  if (!error && Array.isArray(data)) {
+    currentModules = data.map((item) => ({ ...item, required_tier: normalizeTier(item.required_tier) }));
+  } else {
+    currentModules = [];
+  }
+  
+  renderModules();
+}
+
 
     async function signUpStudent() {
       if (!supabaseClient) return alert('Add your Supabase project URL and anon key first.');
