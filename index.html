@@ -1079,7 +1079,7 @@ if (hasSubjectAccess(currentProfile, module)) {
       if (currentSession?.user) {
         const { data: profile } = await supabaseClient
           .from('profiles')
-          .select('id, full_name, phone, role, access_tier, access_expires_at')
+          .select('id, full_name, phone, role, access_tier, access_expires_at, subscribed_subjects')
           .eq('id', currentSession.user.id)
           .maybeSingle();
 
@@ -1088,6 +1088,42 @@ if (hasSubjectAccess(currentProfile, module)) {
 
       renderStaticTierState();
       renderModules();
+async function subscribeToSubject(level, subject, price) {
+  // 1. Check if user is logged in
+  if (!currentProfile || !currentSession?.user) {
+    alert('Please log in or create an account to subscribe.');
+    if (typeof openAuthModal === 'function') openAuthModal();
+    return;
+  }
+
+  const subjectKey = `${level} ${subject}`;
+
+  try {
+    // 2. Call Netlify serverless function to create Paynow transaction
+    const response = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: currentSession.user.email,
+        amount: price,
+        subjectKey: subjectKey,
+        userId: currentSession.user.id
+      })
+    });
+
+    const data = await response.json();
+
+    // 3. Redirect to Paynow payment page if successful
+    if (data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+    } else {
+      alert(data.error || 'Payment initialization failed. Please try again.');
+    }
+  } catch (err) {
+    alert('Error connecting to payment provider: ' + err.message);
+  }
+}
+
       await loadPerformanceSummary();
     }
 
