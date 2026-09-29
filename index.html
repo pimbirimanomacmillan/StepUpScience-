@@ -1021,13 +1021,29 @@
     function badgeLabelForTier(tier) {
       return normalizeTier(tier) === 'Free' ? 'FREE' : (canAccess(tier) ? 'UNLOCKED' : 'LOCKED');
     }
+    
+function getSubjectPrice(level) {
+  return level === 'O-Level' ? 3 : 5;
+}
+
+function hasSubjectAccess(userProfile, module) {
+  if (!module.required_tier || module.required_tier === 'Free') return true;
+
+  const subjectKey = `${module.level} ${module.subject}`;
+  const activeSubs = userProfile?.subscribed_subjects || [];
+  
+  return activeSubs.includes(subjectKey);
+}
 
     function moduleActionButtons(module) {
-      if (canAccess(module.required_tier)) {
-        return `<button class="btn btn-primary" type="button" onclick="openModule('${escapeHtml(module.id)}')"><i class="fa-solid ${module.kind === 'video' ? 'fa-circle-play' : 'fa-file-pdf'}"></i> Open ${module.kind === 'video' ? 'Video' : 'Notes'}</button>`;
-      }
-      return `<button class="btn btn-secondary" type="button" onclick="openSubscriptionModal()"><i class="fa-solid fa-lock"></i> Unlock Module</button>`;
-    }
+if (hasSubjectAccess(currentProfile, module)) {
+    return `<button class="btn btn-primary" type="button" onclick="openModule('${escapeHtml(module.id)}')"><i class="fa-solid ${module.kind === 'video' ? 'fa-circle-play' : 'fa-file-pdf'}"></i> Open ${module.kind === 'video' ? 'Video' : 'Notes'}</button>`;
+  }
+
+  const price = getSubjectPrice(module.level);
+  return `<button class="btn btn-secondary" type="button" onclick="subscribeToSubject('${module.level}', '${module.subject}', ${price})"><i class="fa-solid fa-lock"></i> Unlock ${module.subject} ($${price}/mo)</button>`;
+}
+
 
     function renderModules() {
   const grid = document.querySelector('#view-modules .grid-2') || document.querySelector('#view-home .grid-2');
