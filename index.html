@@ -855,12 +855,12 @@
 
     const TIER_ORDER = { 'Free': 0, 'Tier 1': 1, 'Tier 2': 2 };
     const FALLBACK_MODULES = [
-      { id: 'phys1', title: 'Kinematics & Dynamics', subject: 'Physics', description: 'Projectiles, Linear motion, Newton\'s Laws, and Vectors.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
-      { id: 'chem1', title: 'Atomic Structure & Bonding', subject: 'Chemistry', description: 'Orbitals, Ionization Energies, and Hybridization.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
-      { id: 'phys2', title: 'DC Circuits & Resistance', subject: 'Physics', description: 'Kirchhoff\'s Laws, Internal Resistance, Potential Dividers.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
-      { id: 'chem2', title: 'Organic Mechanisms', subject: 'Chemistry', description: 'Electrophilic and Nucleophilic Addition/Substitution.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
-      { id: 'phys3', title: 'Circular & Gravitational Motion', subject: 'Physics', description: 'Centripetal Acceleration, Gravitational Fields & Orbits.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' },
-      { id: 'chem3', title: 'Ionic Equilibria & Buffers', subject: 'Chemistry', description: 'pH calculations, Ka, Kb, and Henderson-Hasselbalch equation.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' }
+      { id: 'phys1', title: 'Kinematics & Dynamics', subject: 'Physics', level: 'A-Level', description: 'Projectiles, Linear motion, Newton\'s Laws, and Vectors.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
+      { id: 'chem1', title: 'Atomic Structure & Bonding', subject: 'Chemistry', level: 'A-Level', description: 'Orbitals, Ionization Energies, and Hybridization.', required_tier: 'Free', kind: 'pdf', public_url: '', preview_note: 'Configure Supabase and upload the real PDF.' },
+      { id: 'phys2', title: 'DC Circuits & Resistance', subject: 'Physics', level: 'O-Level', description: 'Kirchhoff\'s Laws, Internal Resistance, Potential Dividers.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
+      { id: 'chem2', title: 'Organic Mechanisms', subject: 'Chemistry', level: 'O-Level', description: 'Electrophilic and Nucleophilic Addition/Substitution.', required_tier: 'Tier 1', kind: 'pdf', public_url: '' },
+      { id: 'phys3', title: 'Circular & Gravitational Motion', subject: 'Physics', level: 'A-Level', description: 'Centripetal Acceleration, Gravitational Fields & Orbits.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' },
+      { id: 'chem3', title: 'Ionic Equilibria & Buffers', subject: 'Chemistry', level: 'A-Level', description: 'pH calculations, Ka, Kb, and Henderson-Hasselbalch equation.', required_tier: 'Tier 2', kind: 'pdf', public_url: '' }
     ];
 
     let supabaseClient = null;
