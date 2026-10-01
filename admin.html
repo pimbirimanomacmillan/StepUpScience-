@@ -700,34 +700,32 @@
       </table>
     </div>
   </div>
-
-  <!-- CARD 2: Live Paid Student Bookings Roster -->
-  <div class="card">
-    <div class="card-title">
-      <i class="fa-solid fa-calendar-days"></i> Confirmed Student Bookings
-    </div>
-    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
-      Live list of students who have booked and paid for tutoring sessions.
-    </p>
-
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Topic Focus</th>
-            <th>Requested Date & Time</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="bookings-table-body">
-          <!-- Dynamically populated from Supabase -->
-        </tbody>
-      </table>
-    </div>
+<!-- CARD 2: Live Paid Student Bookings Roster -->
+<div class="card">
+  <div class="card-title">
+    <i class="fa-solid fa-calendar-days"></i> Confirmed Student Bookings
   </div>
+  <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+    Live list of students who have booked and paid for tutoring sessions.
+  </p>
 
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Session Slot</th>
+          <th>Topic / Focus Request</th> <!-- Added column -->
+          <th>Requested Date & Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="bookings-table-body">
+        <!-- Dynamically populated from Supabase -->
+      </tbody>
+    </table>
+  </div>
 </div>
 
      
@@ -1165,6 +1163,36 @@ async function toggleSlotActive(slotId, newStatus) {
   await supabaseClient.from('booking_slots').update({ is_active: newStatus }).eq('id', slotId);
   loadAdminSlots();
 }
+async function loadStudentBookings() {
+  const { data: bookings, error } = await supabaseClient
+    .from('bookings')
+    .select('*, booking_slots(title, start_time)')
+    .order('created_at', { ascending: false });
+
+  const tbody = document.getElementById('bookings-table-body');
+  if (error || !bookings || bookings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6">No confirmed student bookings found yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = bookings.map(b => `
+    <tr>
+      <td><strong>${b.student_name || 'Student'}</strong><br><small>${b.phone || ''}</small></td>
+      <td>${b.booking_slots?.title || 'Tutoring Session'}</td>
+      <td>${b.student_notes ? `<em>${b.student_notes}</em>` : '<span style="color:#888;">No notes added</span>'}</td>
+      <td>${b.booking_slots?.start_time ? new Date(b.booking_slots.start_time).toLocaleString() : '-'}</td>
+      <td>
+        <span class="badge ${b.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending'}">
+          ${b.status}
+        </span>
+      </td>
+      <td>
+        ${b.phone ? `<a href="https://wa.me/${b.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-accent btn-sm">WhatsApp</a>` : '-'}
+      </td>
+    </tr>
+  `).join('');
+}
+
 
 // Run initial loads
 loadAdminSlots();
