@@ -626,56 +626,113 @@
     <!-- ==========================================================================
          TAB 3: TUITION SESSION BOOKINGS
          ========================================================================== -->
-    <div id="tab-bookings" class="tab-panel">
-      <div class="card">
-        <div class="card-title">
-          <i class="fa-solid fa-calendar-days"></i> Requested Tuition Sessions
-        </div>
-        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
-          Review and confirm incoming 1-on-1 practical diagnostic and topic review bookings.
-        </p>
 
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Topic Focus</th>
-                <th>Requested Date & Time</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="bookings-table-body">
-              <tr>
-                <td><strong>Macmillan Pimbirimano</strong></td>
-                <td>A-Level Chemistry (Organic Focus)</td>
-                <td>2026-09-02 @ 11:00 AM</td>
-                <td><span class="badge badge-pending">Pending</span></td>
-                <td>
-                  <button class="btn btn-accent btn-sm" onclick="confirmBooking(this)">
-                    Confirm
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>Kudzai Sithole</td>
-                <td>A-Level Physics (Practical Prep)</td>
-                <td>2026-09-05 @ 02:00 PM</td>
-                <td><span class="badge badge-confirmed">Confirmed</span></td>
-                <td>
-                  <button class="btn btn-secondary btn-sm" disabled>
-                    Done
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+   <div id="tab-bookings" class="tab-panel">
+  
+  <!-- CARD 1: Slot Creation & Schedule Management -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+      <i class="fa-solid fa-calendar-plus"></i> Create & Manage Session Slots
+    </div>
+    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+      Set up upcoming 1-on-1 or group tutoring availability and custom pricing.
+    </p>
+
+    <!-- Slot Creation Form -->
+    <form id="createSlotForm" style="display: grid; gap: 12px; max-width: 500px; margin-bottom: 25px;">
+      <div>
+        <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Session Title</label>
+        <input type="text" id="slotTitle" placeholder="e.g. A-Level Physics 1-on-1 Review" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+      </div>
+
+      <div>
+        <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Session Type</label>
+        <select id="slotType" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+          <option value="private">Private 1-on-1 Session</option>
+          <option value="group">Group Review Session</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Start Date & Time</label>
+        <input type="datetime-local" id="slotTime" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+          <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Price ($)</label>
+          <input type="number" id="slotPrice" step="0.50" value="10.00" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+        </div>
+        <div style="flex: 1;">
+          <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Max Capacity</label>
+          <input type="number" id="slotCapacity" value="1" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
         </div>
       </div>
-    </div>
 
+      <div>
+        <label style="display:block; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">Meeting Link (Google Meet / WhatsApp)</label>
+        <input type="url" id="slotLink" placeholder="https://meet.google.com/xyz" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;" />
+      </div>
+
+      <button type="submit" class="btn btn-accent" style="width:fit-content;">
+        Create Session Slot
+      </button>
+    </form>
+
+    <!-- Table of Created Slots -->
+    <h4 style="margin-bottom:10px;">Active Weekly Slots</h4>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date & Time</th>
+            <th>Type</th>
+            <th>Price ($)</th>
+            <th>Booked / Cap</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="adminSlotsTableBody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- CARD 2: Live Paid Student Bookings Roster -->
+  <div class="card">
+    <div class="card-title">
+      <i class="fa-solid fa-calendar-days"></i> Confirmed Student Bookings
+    </div>
+    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+      Live list of students who have booked and paid for tutoring sessions.
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Topic Focus</th>
+            <th>Requested Date & Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-table-body">
+          <!-- Dynamically populated from Supabase -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+     
+       
+                       
 
   <!-- ==========================================================================
        BOTTOM NAVIGATION BAR
@@ -1006,6 +1063,113 @@
         await loadAdminData();
       }
     });
+// 1. Fetch & Render Available Slots
+async function loadAdminSlots() {
+  const { data: slots, error } = await supabaseClient
+    .from('booking_slots')
+    .select('*')
+    .order('start_time', { ascending: true });
+
+  const tbody = document.getElementById('adminSlotsTableBody');
+  if (error || !slots || slots.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7">No slots created yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = slots.map(s => `
+    <tr>
+      <td><b>${s.title}</b></td>
+      <td>${new Date(s.start_time).toLocaleString()}</td>
+      <td>${s.session_type === 'private' ? 'Private' : 'Group'}</td>
+      <td>
+        $<input type="number" value="${s.price}" step="0.5" style="width:60px; padding:2px;" id="price-${s.id}" />
+        <button onclick="updateSlotPrice('${s.id}')" class="btn btn-sm" style="cursor:pointer;">Save</button>
+      </td>
+      <td>${s.booked_count} / ${s.max_capacity}</td>
+      <td>${s.is_active ? '<span style="color:green; font-weight:bold;">Active</span>' : '<span style="color:red;">Disabled</span>'}</td>
+      <td>
+        <button onclick="toggleSlotActive('${s.id}', ${!s.is_active})" class="btn btn-sm btn-secondary">
+          ${s.is_active ? 'Disable' : 'Enable'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// 2. Fetch & Render Live Confirmed Bookings
+async function loadStudentBookings() {
+  const { data: bookings, error } = await supabaseClient
+    .from('bookings')
+    .select('*, booking_slots(title, start_time)')
+    .order('created_at', { ascending: false });
+
+  const tbody = document.getElementById('bookings-table-body');
+  if (error || !bookings || bookings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No confirmed student bookings found yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = bookings.map(b => `
+    <tr>
+      <td><strong>${b.student_name || 'Student'}</strong><br><small>${b.phone || ''}</small></td>
+      <td>${b.booking_slots?.title || 'Tutoring Session'}</td>
+      <td>${b.booking_slots?.start_time ? new Date(b.booking_slots.start_time).toLocaleString() : '-'}</td>
+      <td>
+        <span class="badge ${b.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending'}">
+          ${b.status}
+        </span>
+      </td>
+      <td>
+        ${b.phone ? `<a href="https://wa.me/${b.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-accent btn-sm">WhatsApp</a>` : '-'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+// 3. Create Slot Form Submission
+document.getElementById('createSlotForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('slotTitle').value;
+  const session_type = document.getElementById('slotType').value;
+  const start_time = new Date(document.getElementById('slotTime').value).toISOString();
+  const price = parseFloat(document.getElementById('slotPrice').value);
+  const max_capacity = parseInt(document.getElementById('slotCapacity').value);
+  const meeting_link = document.getElementById('slotLink').value;
+
+  const { error } = await supabaseClient.from('booking_slots').insert({
+    title, session_type, start_time, price, max_capacity, meeting_link
+  });
+
+  if (error) {
+    alert('Error creating slot: ' + error.message);
+  } else {
+    alert('Slot created successfully!');
+    document.getElementById('createSlotForm').reset();
+    loadAdminSlots();
+  }
+});
+
+// 4. Update Price Helper
+async function updateSlotPrice(slotId) {
+  const newPrice = parseFloat(document.getElementById(`price-${slotId}`).value);
+  const { error } = await supabaseClient.from('booking_slots').update({ price: newPrice }).eq('id', slotId);
+  if (error) alert('Error updating price: ' + error.message);
+  else {
+    alert('Price updated!');
+    loadAdminSlots();
+  }
+}
+
+// 5. Toggle Active/Disabled Status
+async function toggleSlotActive(slotId, newStatus) {
+  await supabaseClient.from('booking_slots').update({ is_active: newStatus }).eq('id', slotId);
+  loadAdminSlots();
+}
+
+// Run initial loads
+loadAdminSlots();
+loadStudentBookings();
+
   </script>
 
 </body>
