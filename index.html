@@ -672,70 +672,72 @@
     <!-- ==========================================================================
          VIEW 2: TUTORING BOOKING SYSTEM
          ========================================================================== -->
-    <div id="view-booking" class="view-panel">
-      <div class="card">
-        <div class="card-title">
-          🗓️ Book Personal Tuition Session
-        </div>
-        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
-          Reserve a 1-on-1 practical diagnostic or topic breakdown session with an instructor.
-        </p>
-
-        <form id="booking-form" onsubmit="handleBookingSubmit(event)">
-          <div class="form-group">
-            <label>Full Student Name</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="book-name" 
-              required 
-              placeholder="Enter student name"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Subject Topic Focus</label>
-            <select class="form-control" id="book-subject" required>
-              <option value="A-Level Physics (Paper 1 & 2)">A-Level Physics (Paper 1 & 2)</option>
-              <option value="A-Level Physics (Practical Prep)">A-Level Physics (Practical Prep)</option>
-              <option value="A-Level Chemistry (Organic Focus)">A-Level Chemistry (Organic Focus)</option>
-              <option value="A-Level Chemistry (Physical & In-organic)">A-Level Chemistry (Physical & In-organic)</option>
-            </select>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Preferred Session Date</label>
-              <input type="date" class="form-control" id="book-date" required>
-            </div>
-
-            <div class="form-group">
-              <label>Preferred Time Slot</label>
-              <select class="form-control" id="book-time" required>
-                <option value="09:00 AM - 10:30 AM">09:00 AM - 10:30 AM</option>
-                <option value="11:00 AM - 12:30 PM">11:00 AM - 12:30 PM</option>
-                <option value="02:00 PM - 03:30 PM">02:00 PM - 03:30 PM</option>
-                <option value="04:00 PM - 05:30 PM">04:00 PM - 05:30 PM</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Special Notes / Specific Topics Needed</label>
-            <textarea 
-              class="form-control" 
-              id="book-notes" 
-              rows="3" 
-              placeholder="e.g. Need specific help on Kirchhoff's laws circuit equations..."
-            ></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary">
-            ✈️ Confirm Booking Request
-          </button>
-        </form>
-      </div>
+<div id="view-booking" class="view-panel">
+  <div class="card">
+    <div class="card-title">
+      <i class="fa-solid fa-calendar-check"></i> Book Tutoring Sessions
     </div>
+    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+      Select an available 1-on-1 or group session slot below and secure your spot instantly via EcoCash.
+    </p>
+
+    <!-- Slots Grid (Dynamically Populated) -->
+    <div id="sessionsListGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+      <!-- Available slots load here dynamically -->
+    </div>
+  </div>
+</div>
+
+<!-- Paynow Payment Modal -->
+<div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:white; padding:25px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 id="paymentModalTitle" style="margin:0;">Secure Payment</h3>
+      <button onclick="closePaymentModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+    
+    <div style="text-align:center; margin-bottom:20px;">
+      <p style="font-size:0.9rem; color:#555; margin-bottom:5px;">You are paying for:</p>
+      <p id="paymentItemDescription" style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">Tutoring Session</p>
+      <p style="font-size:1.5rem; font-weight:800; color:var(--accent);">
+        $<span id="paymentModalAmount">10.00</span>
+      </p>
+    </div>
+
+    <form id="paymentForm" onsubmit="processBookingPayment(event)">
+      <input type="hidden" id="payUserId">
+      <input type="hidden" id="paySlotId">
+      <input type="hidden" id="paySlotTitle">
+      <input type="hidden" id="payAmount">
+
+      <!-- Student Topic / Focus Request Note -->
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Specific Topic / Question Focus (Optional)</label>
+        <textarea id="payStudentNotes" placeholder="e.g. Need help with Organic Chemistry mechanisms or ZIMSEC 2023 Q3..." rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:0.9rem;"></textarea>
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">EcoCash / Mobile Number</label>
+        <input type="tel" id="paynowPhone" placeholder="07xxxxxxxx" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:1rem;">
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Payment Method</label>
+        <select id="paynowMethod" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; font-size:1rem;">
+          <option value="ecocash">EcoCash / OneMoney</option>
+        </select>
+      </div>
+
+      <div id="paymentStatusArea" style="text-align:center; display:none; margin-bottom:15px;">
+        <p style="color:blue;">Sending request... Please check your phone.</p>
+      </div>
+
+      <button type="submit" class="btn btn-accent" id="paySubmitBtn" style="width:100%; padding:12px; font-weight:bold; font-size:1.1rem;">
+        Confirm Payment
+      </button>
+    </form>
+  </div>
+</div>
 
     <!-- ==========================================================================
          VIEW 3: PROFILE & ACCOUNT CONTROL
@@ -1388,6 +1390,169 @@ Schedule: ${date} at ${time}`);
       await refreshStudentContext();
       await loadModules();
     });
+let currentSlotPurchase = null;
+
+// 1. Fetch & Render Available Slots
+async function loadAvailableSlots() {
+  const { data: slots, error } = await supabaseClient
+    .from('booking_slots')
+    .select('*')
+    .eq('is_active', true)
+    .order('start_time', { ascending: true });
+
+  const grid = document.getElementById('sessionsListGrid');
+  if (error || !slots || slots.length === 0) {
+    grid.innerHTML = '<p>No tutoring sessions available right now. Check back soon!</p>';
+    return;
+  }
+
+  grid.innerHTML = slots.map(s => {
+    const isFull = s.booked_count >= s.max_capacity;
+    const isGroup = s.session_type === 'group';
+    const startTime = new Date(s.start_time);
+    const day = startTime.toLocaleDateString('en-ZW', { weekday: 'short' });
+    const date = startTime.toLocaleDateString('en-ZW', { month: 'short', day: 'numeric' });
+    const time = startTime.toLocaleTimeString('en-ZW', { hour: 'numeric', minute: '2-digit' });
+
+    return `
+      <div style="background:#fff; border:1px solid #eee; border-radius:8px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:0.75rem; font-weight:bold; text-transform:uppercase; color:#fff; background:${isGroup ? '#6f42c1' : 'var(--accent)'}; padding:3px 8px; border-radius:20px;">
+            ${isGroup ? 'Group' : '1-on-1'}
+          </span>
+          <span style="font-weight:800; font-size:1.25rem; color:var(--accent);">$${s.price.toFixed(2)}</span>
+        </div>
+        
+        <h3 style="margin: 0 0 15px 0; font-size:1.1rem;">${s.title}</h3>
+        
+        <div style="font-size:0.9rem; color:#555; margin-bottom:15px; display:flex; flex-direction:column; gap:5px;">
+          <div><i class="fa-solid fa-calendar-day" style="width:18px;"></i> ${day}, ${date}</div>
+          <div><i class="fa-solid fa-clock" style="width:18px;"></i> ${time}</div>
+          <div><i class="fa-solid fa-users" style="width:18px;"></i> ${s.max_capacity - s.booked_count} spots left</div>
+        </div>
+
+        ${isFull 
+          ? `<button disabled class="btn btn-secondary" style="width:100%; opacity:0.6;">Fully Booked</button>`
+          : `<button onclick="initiateSlotPurchase('${s.id}', '${s.title}',${s.price})" class="btn btn-accent" style="width:100%; font-weight:bold;">Book & Pay Instantly</button>`
+        }
+      </div>
+    `;
+  }).join('');
+}
+
+// 2. Open Modal & Attach Slot ID
+function initiateSlotPurchase(slotId, slotTitle, price) {
+  const session = supabaseClient.auth.session();
+  if (!session) {
+    alert("Please log in to book a session.");
+    return;
+  }
+
+  document.getElementById('paymentModalTitle').textContent = "Confirm Booking";
+  document.getElementById('paymentItemDescription').innerHTML = `<small>Tutoring Booking:</small><br><b>${slotTitle}</b>`;
+  document.getElementById('paymentModalAmount').textContent = price.toFixed(2);
+  
+  document.getElementById('payUserId').value = session.user.id;
+  document.getElementById('paySlotId').value = slotId;
+  document.getElementById('paySlotTitle').value = slotTitle;
+  document.getElementById('payAmount').value = price.toFixed(2);
+
+  document.getElementById('paymentModal').style.display = 'flex';
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentModal').style.display = 'none';
+  document.getElementById('paymentStatusArea').style.display = 'none';
+  document.getElementById('paySubmitBtn').disabled = false;
+}
+
+// 3. Process Booking Payment to Netlify Function
+async function processBookingPayment(e) {
+  e.preventDefault();
+  const phone = document.getElementById('paynowPhone').value;
+  const method = document.getElementById('paynowMethod').value;
+  const userId = document.getElementById('payUserId').value;
+  const slotId = document.getElementById('paySlotId').value;
+  const slotTitle = document.getElementById('paySlotTitle').value;
+  const amount = document.getElementById('payAmount').value;
+  const studentNotes = document.getElementById('payStudentNotes').value;
+
+  if (!phone || !phone.match(/^(07|2637)[1-9][0-9]{7}$/)) {
+    alert("Please enter a valid Zimbabwean mobile number (e.g., 0771234567).");
+    return;
+  }
+
+  const statusArea = document.getElementById('paymentStatusArea');
+  const submitBtn = document.getElementById('paySubmitBtn');
+  statusArea.style.display = 'block';
+  statusArea.innerHTML = '<p style="color:blue;"><i class="fa-solid fa-spinner fa-spin"></i> Contacting Paynow...</p>';
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch('/.netlify/functions/paynow-pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, slotId, slotTitle, amount, phone, method, studentNotes })
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.pollUrl) {
+      currentSlotPurchase = { pollUrl: result.pollUrl, attempts: 0 };
+      statusArea.innerHTML = '<p style="color:orange;"><i class="fa-solid fa-hourglass-start"></i> Request sent. Check your phone...</p>';
+      startBookingPolling(slotTitle);
+    } else {
+      throw new Error(result.error || "Payment initialisation failed.");
+    }
+
+  } catch (error) {
+    statusArea.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+    submitBtn.disabled = false;
+  }
+}
+
+// 4. Polling Confirmation
+function startBookingPolling(sessionName) {
+  if (!currentSlotPurchase || !currentSlotPurchase.pollUrl) return;
+
+  const interval = setInterval(async () => {
+    try {
+      currentSlotPurchase.attempts++;
+      if (currentSlotPurchase.attempts > 100) {
+        clearInterval(interval);
+        alert(`Payment timeout for "${sessionName}".`);
+        closePaymentModal();
+        return;
+      }
+
+      const session = supabaseClient.auth.session();
+      const { data: booking } = await supabaseClient
+        .from('bookings')
+        .select('status')
+        .eq('student_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (booking && booking.status === 'confirmed') {
+        clearInterval(interval);
+        document.getElementById('paymentStatusArea').innerHTML = `
+          <p style="color:green; font-weight:bold;">Booking Confirmed!</p>
+        `;
+        loadAvailableSlots();
+        setTimeout(closePaymentModal, 3000);
+      }
+    } catch (err) {
+      console.error('Polling error:', err.message);
+    }
+  }, 3000);
+}
+
+// Initial trigger
+if (supabaseClient.auth.session()) {
+  loadAvailableSlots();
+}
+
   </script>
 
 </body>
