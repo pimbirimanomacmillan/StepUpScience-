@@ -1185,8 +1185,52 @@ async function subscribeToSubject(level, subject, price) {
       if (error) return alert(error.message);
       await refreshStudentContext();
       await loadModules();
-      alert('Signed in successfully.');
+
+//Enforce session guard 
+initSessionGuard(supabaseClient.auth.user()?.id || supabaseClient.auth.session()?.user?.id);
+alert('Signed in successfully.');
     }
+
+// Enforce single active session
+async function initSessionGuard(userId) {
+  if (!supabaseClient) return;
+
+  let currentSessionToken = localStorage.getItem('stepup_session_token');
+  if (!currentSessionToken) {
+    currentSessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('stepup_session_token', currentSessionToken);
+  }
+
+  // Register session token in Supabase
+  await supabaseClient.rpc('register_active_session', {
+    user_id: userId,
+    session_id: currentSessionToken,
+  });
+
+  // Listen for Realtime changes on user profile
+  supabaseClient
+    .channel(`public:profiles:id=eq.${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${userId}`,
+      },
+      (payload) => {
+        const newActiveSession = payload.new.active_session_id;
+        const mySessionToken = localStorage.getItem('stepup_session_token');
+
+        if (newActiveSession && newActiveSession !== mySessionToken) {
+          alert('You were logged out because this account was accessed on another device.');
+          localStorage.removeItem('stepup_session_token');
+          signOutStudent();
+        }
+      }
+    )
+    .subscribe();
+}
 
     async function signOutStudent() {
       if (!supabaseClient) {
@@ -1196,12 +1240,14 @@ async function subscribeToSubject(level, subject, price) {
         renderModules();
         return;
       }
-      await supabaseClient.auth.signOut();
+  
+  localStorage.removeItem('stepup_session_token');
+  await supabaseClient.auth.signOut();
+  
       currentSession = null;
       currentProfile = null;
       renderStaticTierState();
-      renderModules();
-      document.getElementById('performance-summary').innerText = 'Signed out. Sign in to see quiz performance and progress tracking.';
+      renderModules();
     }
 
     async function refreshAccessFromDatabase() {
@@ -1549,7 +1595,9 @@ function startBookingPolling(sessionName) {
 }
 
 // Initial trigger
-if (supabaseClient.auth.session()) {
+const session = supabaseClient.auth.session?.() || supabaseClient.auth.getSession?.();
+if (session?.user) {
+  initSessionGuard(session.user.id);
   loadAvailableSlots();
 }
 
