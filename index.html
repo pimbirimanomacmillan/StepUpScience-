@@ -1119,7 +1119,7 @@ async function startSubjectPayment() {
   const amount = calculateSelectedPrice();
 
   try {
-    const res = await fetch('/.netlify/functions/paynow-init', {
+    const res = await fetch('/.netlify/functions/paynow-pay', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
