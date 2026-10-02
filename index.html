@@ -1065,8 +1065,86 @@ if (hasSubjectAccess(currentProfile, module)) {
       <div>${moduleActionButtons(module)}</div>
     </div>`).join('');
 } 
+// Check if student has access to a specific subject & level
+function hasAccessToSubject(subject, level) {
+  if (!currentProfile) return false;
 
-    async function refreshStudentContext() {
+  const userLevel = currentProfile.active_level;
+  const userSubjects = currentProfile.active_subjects || [];
+
+  const levelMatch = userLevel === level;
+  const subjectMatch = userSubjects.includes(subject.toLowerCase());
+
+  return levelMatch && subjectMatch;
+}
+// Calculate total price based on level and checked subjects
+function calculateSelectedPrice() {
+  const levelSelect = document.getElementById('sub-level-select');
+  const physChecked = document.getElementById('sub-chk-physics')?.checked;
+  const chemChecked = document.getElementById('sub-chk-chemistry')?.checked;
+
+  if (!levelSelect) return 0;
+  const level = levelSelect.value;
+
+  let total = 0;
+  if (physChecked && chemChecked) {
+    total = level === 'O-Level' ? 5 : 8;
+  } else if (physChecked || chemChecked) {
+    total = level === 'O-Level' ? 3 : 5;
+  }
+
+  const priceDisplay = document.getElementById('sub-total-price');
+  if (priceDisplay) {
+    priceDisplay.innerText = `$${total}.00`;
+  }
+
+  return total;
+}
+
+// Initiate Paynow payment with selected options
+async function startSubjectPayment() {
+  const level = document.getElementById('sub-level-select').value;
+  const physChecked = document.getElementById('sub-chk-physics').checked;
+  const chemChecked = document.getElementById('sub-chk-chemistry').checked;
+
+  const subjects = [];
+  if (physChecked) subjects.push('physics');
+  if (chemChecked) subjects.push('chemistry');
+
+  if (subjects.length === 0) {
+    alert('Please select at least one subject.');
+    return;
+  }
+
+  const amount = calculateSelectedPrice();
+
+  try {
+    const res = await fetch('/.netlify/functions/paynow-init', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: currentProfile?.id,
+        email: currentProfile?.email,
+        level: level,
+        subjects: subjects,
+        amount: amount
+      })
+    });
+    
+    const data = await res.json();
+    if (data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+    } else {
+      alert(data.error || 'Could not initiate payment. Please try again.');
+    }
+  } catch (err) {
+    console.error('Payment initiation error:', err);
+    alert('An error occurred. Check your network connection.');
+  }
+}
+
+
+   async function refreshStudentContext() {
       currentSession = null;
       currentProfile = null;
       if (!supabaseClient) {
@@ -1602,6 +1680,39 @@ if (session?.user) {
 }
 
   </script>
+<!-- Per-Subject Subscription Modal -->
+<div id="subscription-modal" class="modal-overlay" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="max-width: 400px; width: 90%; padding: 24px; background: #fff; border-radius: 12px; font-family: sans-serif;">
+    <h3 style="margin-top: 0;">Select Subscription Plan</h3>
+    
+    <div style="margin-bottom: 15px;">
+      <label for="sub-level-select"><strong>Academic Level:</strong></label>
+      <select id="sub-level-select" onchange="calculateSelectedPrice()" style="width: 100%; padding: 10px; margin-top: 6px; border-radius: 6px; border: 1px solid #ccc;">
+        <option value="O-Level">O-Level ($3 single / $5 dual)</option>
+        <option value="A-Level">A-Level ($5 single / $8 dual)</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <p style="margin-bottom: 8px;"><strong>Select Subjects:</strong></p>
+      <label style="display:block; margin-bottom: 8px; cursor: pointer;">
+        <input type="checkbox" id="sub-chk-physics" onchange="calculateSelectedPrice()"> Physics
+      </label>
+      <label style="display:block; cursor: pointer;">
+        <input type="checkbox" id="sub-chk-chemistry" onchange="calculateSelectedPrice()"> Chemistry
+      </label>
+    </div>
+
+    <div style="margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+      <p style="margin: 0; font-size: 1.1em;">Total Amount: <strong id="sub-total-price" style="color: #2e7d32;">$0.00</strong></p>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <button onclick="startSubjectPayment()" style="flex:1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Pay via Paynow</button>
+      <button onclick="document.getElementById('subscription-modal').style.display='none'" style="padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
