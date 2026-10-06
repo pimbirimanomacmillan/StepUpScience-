@@ -1782,6 +1782,54 @@ if (session?.user) {
     <a href="#" onclick="document.getElementById('terms-modal').style.display='block'; return false;" style="color: #2563eb; text-decoration: underline; margin: 0 8px;">Support Contact</a>
   </p>
 </footer>
+<!-- Payment Timeout Modal -->
+<div id="payment-timeout-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+  <div style="background: #ffffff; color: #1f2937; max-width: 460px; margin: 80px auto; border-radius: 12px; padding: 24px; font-family: sans-serif; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+    <div style="font-size: 2.8rem; margin-bottom: 10px;">⏳</div>
+    <h3 style="margin: 0 0 8px 0; font-size: 1.25rem; color: #0f172a;">Payment Confirmation Timed Out</h3>
+    <p style="font-size: 0.92rem; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+      We didn't receive immediate confirmation from EcoCash/Paynow. If you entered your PIN, your account may take a minute to activate.
+    </p>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button onclick="document.getElementById('payment-timeout-modal').style.display='none'; if(window.startSubjectPayment) startSubjectPayment();" style="background: #2563eb; color: #fff; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; flex: 1; font-size: 0.9rem;">Retry Payment</button>
+      <a href="https://wa.me/263786781956?text=Hi%20StepUp%20Science,%20my%20payment%20timed%20out." target="_blank" style="background: #25d366; color: #fff; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; flex: 1; font-size: 0.9rem; display: inline-block; line-height: 20px;">WhatsApp Help</a>
+    </div>
+    <div style="margin-top: 14px;">
+      <button onclick="document.getElementById('payment-timeout-modal').style.display='none'" style="background: transparent; border: none; color: #64748b; font-size: 0.85rem; cursor: pointer; text-decoration: underline;">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Error Modal -->
+<div id="payment-error-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+  <div style="background: #ffffff; color: #1f2937; max-width: 460px; margin: 80px auto; border-radius: 12px; padding: 24px; font-family: sans-serif; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+    <div style="font-size: 2.8rem; margin-bottom: 10px;">❌</div>
+    <h3 style="margin: 0 0 8px 0; font-size: 1.25rem; color: #0f172a;">Payment Unsuccessful</h3>
+    <p id="payment-error-msg" style="font-size: 0.92rem; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+      The transaction was cancelled or declined. Please check your EcoCash balance and try again.
+    </p>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button onclick="document.getElementById('payment-error-modal').style.display='none'; if(window.startSubjectPayment) startSubjectPayment();" style="background: #2563eb; color: #fff; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; flex: 1; font-size: 0.9rem;">Try Again</button>
+      <a href="https://wa.me/263786781956?text=Hi%20StepUp%20Science,%20my%20payment%20failed." target="_blank" style="background: #25d366; color: #fff; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; flex: 1; font-size: 0.9rem; display: inline-block; line-height: 20px;">Contact Support</a>
+    </div>
+    <div style="margin-top: 14px;">
+      <button onclick="document.getElementById('payment-error-modal').style.display='none'" style="background: transparent; border: none; color: #64748b; font-size: 0.85rem; cursor: pointer; text-decoration: underline;">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Trigger Helper Script -->
+<script>
+  function showPaymentTimeout() {
+    document.getElementById('payment-timeout-modal').style.display = 'block';
+  }
+  function showPaymentError(customMessage) {
+    if (customMessage) {
+      document.getElementById('payment-error-msg').innerText = customMessage;
+    }
+    document.getElementById('payment-error-modal').style.display = 'block';
+  }
+</script>
 
 </body>
 </html>
