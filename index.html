@@ -943,7 +943,8 @@
             </div>
             <div class="form-group">
               <label>Password</label>
-              <input type="password" id="auth-password" class="form-control" placeholder="Enter password">
+              <input type="password" id="auth-password" class="form-control" placeholder="Enter password"> <a href="#" onclick="showForgotPasswordModal(); return false;" style="font-size: 0.85rem; color: #2563eb; text-decoration: underline; display: block; margin-top: 6px;">Forgot Password?</a>
+
             </div>
             <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
               <button class="btn btn-primary" type="button" onclick="signInStudent()"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
@@ -1828,6 +1829,86 @@ if (session?.user) {
       document.getElementById('payment-error-msg').innerText = customMessage;
     }
     document.getElementById('payment-error-modal').style.display = 'block';
+  }
+</script>
+<!-- Forgot Password Modal -->
+<div id="forgot-password-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+  <div style="background: #ffffff; color: #1f2937; max-width: 420px; margin: 80px auto; border-radius: 12px; padding: 24px; font-family: sans-serif; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 1.2rem; color: #0f172a;">Reset Password</h3>
+      <button onclick="document.getElementById('forgot-password-modal').style.display='none'" style="background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: #64748b;">&times;</button>
+    </div>
+
+    <p style="font-size: 0.9rem; color: #475569; line-height: 1.5; margin-bottom: 16px;">
+      Enter your registered email address below and we will send you a password reset link.
+    </p>
+
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">Email Address</label>
+      <input type="email" id="reset-email-input" placeholder="student@example.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem;">
+    </div>
+
+    <div id="reset-msg-box" style="display: none; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px;"></div>
+
+    <button id="send-reset-btn" onclick="handlePasswordResetRequest()" style="width: 100%; background: #2563eb; color: #ffffff; border: none; padding: 11px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem;">Send Reset Link</button>
+  </div>
+</div>
+
+<!-- Password Reset Helper Script -->
+<script>
+  function showForgotPasswordModal() {
+    document.getElementById('reset-msg-box').style.display = 'none';
+    document.getElementById('reset-email-input').value = '';
+    document.getElementById('forgot-password-modal').style.display = 'block';
+  }
+
+  async function handlePasswordResetRequest() {
+    const emailInput = document.getElementById('reset-email-input');
+    const msgBox = document.getElementById('reset-msg-box');
+    const btn = document.getElementById('send-reset-btn');
+    const email = emailInput.value.trim();
+
+    if (!email) {
+      msgBox.style.display = 'block';
+      msgBox.style.background = '#fef2f2';
+      msgBox.style.color = '#991b1b';
+      msgBox.innerText = 'Please enter your email address.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Sending...';
+
+    try {
+      if (typeof supabase === 'undefined') {
+        throw new Error('Supabase library is not loaded on this page.');
+      }
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://quiet-cassata-d67181.netlify.app/?type=recovery'
+      });
+
+      msgBox.style.display = 'block';
+      if (error) {
+        msgBox.style.background = '#fef2f2';
+        msgBox.style.color = '#991b1b';
+        msgBox.innerText = error.message;
+      } else {
+        msgBox.style.background = '#f0fdf4';
+        msgBox.style.color = '#166534';
+        msgBox.innerText = 'Reset link sent! Check your email inbox.';
+        emailInput.value = '';
+      }
+    } catch (err) {
+      msgBox.style.display = 'block';
+      msgBox.style.background = '#fef2f2';
+      msgBox.style.color = '#991b1b';
+      msgBox.innerText = err.message || 'Error sending request. Try again.';
+    } finally {
+      btn.disabled = false;
+      btn.innerText = 'Send Reset Link';
+    }
   }
 </script>
 
