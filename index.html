@@ -26,6 +26,66 @@
 
 
  <style>
+/* --- NEW Badge Styling --- */
+.badge-new {
+  background-color: #e11d48;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(225, 29, 72, 0.3);
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* --- Badge & Tag Container --- */
+.card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.badge-free {
+  background-color: #10b981;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.badge-paid {
+  background-color: #6366f1;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+/* --- Card Visual Polish --- */
+.module-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
   /* Prevents icons from swallowing clicks */
   .bottom-nav *, .nav-item * {
     pointer-events: none;
@@ -944,26 +1004,38 @@ if (hasSubjectAccess(currentProfile, module)) {
   const price = getSubjectPrice(module.level);
   return `<button class="btn btn-secondary" type="button" onclick="subscribeToSubject('${module.level}', '${module.subject}', ${price})"><i class="fa-solid fa-lock"></i> Unlock ${module.subject} ($${price}/mo)</button>`;
 }
-
-
-    function renderModules() {
-  const grid = document.querySelector('#view-modules .grid-2') || document.querySelector('#view-home .grid-2');
+   function renderModules() {
+  const grid =
+    document.querySelector('#view-modules .grid-2') ||
+    document.querySelector('#view-home .grid-2');
   if (!grid) return;
 
-  grid.innerHTML = currentModules.map((module) => `
-    <div class="resource-card">
-      <div>
-        <div class="resource-header">
-          <span class="subject-tag ${getSubjectClass(module.subject)}">${escapeHtml(module.subject || 'Science')}</span>
-          <span class="badge ${badgeClassForTier(module.required_tier)}">${badgeLabelForTier(module.required_tier)}</span>
+  grid.innerHTML = currentModules.map((module) => {
+    // 1. Check if module was created in the last 7 days
+    const createdDate = new Date(module.created_at);
+    const now = new Date();
+    const daysOld = (now - createdDate) / (1000 * 60 * 60 * 24);
+    const isNew = daysOld <= 7;
+    const newBadgeHtml = isNew ? `<span class="badge-new">NEW</span>` : '';
+
+    // 2. Return card HTML with the NEW badge included in the header
+    return `
+      <div class="resource-card">
+        <div>
+          <div class="resource-header">
+            <span class="subject-tag ${getSubjectClass(module.subject)}">${escapeHtml(module.subject || 'Science')}</span>
+            <span class="badge ${badgeClassForTier(module.required_tier)}">${badgeLabelForTier(module.required_tier)}</span>
+            ${newBadgeHtml}
+          </div>
+          <h4 style="margin-top:0.6rem;">${escapeHtml(module.title)}</h4>
+          <p style="font-size:0.825rem;color:var(--gray-600);margin-top:0.3rem;">${escapeHtml(module.description || '')}</p>
+          <p style="font-size:0.75rem;color:var(--gray-500);margin-top:0.45rem;">Required access: ${escapeHtml(normalizeTier(module.required_tier))}</p>
         </div>
-        <h4 style="margin-top:0.6rem;">${escapeHtml(module.title)}</h4>
-        <p style="font-size:0.825rem;color:var(--gray-600);margin-top:0.3rem;">${escapeHtml(module.description || '')}</p>
-        <p style="font-size:0.75rem;color:var(--gray-500);margin-top:0.45rem;">Required access: ${escapeHtml(normalizeTier(module.required_tier))}</p>
-      </div>
-      <div>${moduleActionButtons(module)}</div>
-    </div>`).join('');
-} 
+        <div>${moduleActionButtons(module)}</div>
+      </div>`;
+  }).join('');
+}
+
 // Check if student has access to a specific subject & level
 function hasAccessToSubject(subject, level) {
   if (!currentProfile) return false;
