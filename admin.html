@@ -754,7 +754,29 @@
        APPLICATION LOGIC & SCRIPT
        ========================================================================== -->
   
-  <script>
+    <script>
+    // Bottom navigation view switcher
+    window.switchView = function(viewId, element) {
+      // Hide all views and tab contents
+      document.querySelectorAll('.view, .tab-content').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      // Show the requested target view
+      const target = document.getElementById(viewId);
+      if (target) {
+        target.style.display = 'block';
+      }
+
+      // Update active state on bottom navigation items if an element was passed
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        element.classList.add('active');
+      }
+    };
+
     const APP_CONFIG = {
       SUPABASE_URL: 'https://phiyuvpwvaaarnockyqm.supabase.co/rest/v1/',
       SUPABASE_ANON_KEY: 'sb_publishable_NFYozwSjCZ1gB8FONH8FhA_r-MJCAq6',
