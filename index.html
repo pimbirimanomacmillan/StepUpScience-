@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StepUp Science - Comprehensive Student Portal</title>
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Open Graph / WhatsApp Preview Meta Tags (Updated to Vercel) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://stepupscience-if9s.vercel.app/">
+  <meta property="og:title" content="StepUp Science | ZIMSEC & Cambridge Revision">
+  <meta property="og:description" content="Master O-Level & A-Level Physics and Chemistry. Download high-yield ZIMSEC revision guides and worked solutions. EcoCash • InnBucks • Cards • Mobile Money accepted.">
+  <meta property="og:image" content="https://stepupscience-if9s.vercel.app/whatsapp-preview.jpg">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://stepupscience-if9s.vercel.app/">
+  <meta property="twitter:title" content="StepUp Science | ZIMSEC & Cambridge Revision">
+  <meta property="twitter:description" content="Master O-Level & A-Level Physics and Chemistry. Download high-yield ZIMSEC revision guides and worked solutions. EcoCash • InnBucks • Cards • Mobile Money accepted.">
+  <meta property="twitter:image" content="https://stepupscience-if9s.vercel.app/whatsapp-preview.jpg">
+
+  <!-- External Stylesheets & Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* --- NEW Badge Styling --- */
+    .badge-new {
+      background-color: #e11d48;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 4px rgba(225, 29, 72, 0.3);
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* --- Badge & Tag Container --- */
+    .card-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .badge-free {
+      background-color: #10b981;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .badge-paid {
+      background-color: #6366f1;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    /* --- Card Visual Polish --- */
+    .module-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      border-color: #cbd5e1;
+    }
+
+    /* Styles the emojis for bottom navigation */
+    .nav-icon {
+      font-size: 1.25rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* Stack syllabus cards vertically on mobile screens */
+    .syllabus-container, .levels-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .syllabus-card {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ==========================================================================
+       1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
+       ========================================================================== */
+    :root {
+      --primary: #1e40af;
+      --primary-hover: #1e3a8a;
+      --primary-light: #eff6ff;
+      --secondary: #7c3aed;
+      --secondary-hover: #6d28d9;
+      --secondary-light: #f5f3ff;
+      --accent: #0284c7;
+      --dark: #0f172a;
+      --dark-surface: #1e293b;
+      --light: #f8fafc;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================================================
+       2. GLOBAL RESET & BASE STYLES
+       ========================================================================== */
+    *, 
+    *::before, 
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--light);
+      color: var(--gray-800);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    input, 
+    select, 
+    textarea {
+      font: inherit;
+    }
+
+    /* ==========================================================================
+       3. HEADER & TOP NAVIGATION
+       ========================================================================== */
+    header {
+      background: linear-gradient(135deg, var(--dark) 0%, #1e1b4b 100%);
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--gray-300);
+      margin-top: 0.25rem;
+      font-weight: 400;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      margin-top: 0.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(4px);
+    }
+
+    /* ==========================================================================
+       4. CONTAINER & VIEW PANELS
+       ========================================================================== */
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1rem;
+      flex: 1;
+    }
+
+    .view-panel {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .view-panel.active {
+      display: block !important;
+      opacity: 1;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .banner-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       5. BUTTON STYLES & CONTROLS
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .btn-purple {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-purple:hover {
+      background: var(--secondary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ==========================================================================
+       6. GRID LAYOUT & RESOURCE CARDS
+       ========================================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .resource-card {
+      background: white;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .resource-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .resource-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .subject-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-physics {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .tag-chemistry {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .badge-locked {
+      background: var(--danger-light);
+      color: #991b1b;
+    }
+
+    .badge-free {
+      background: var(--success-light);
+      color: #065f46;
+    }
+
+    /* ==========================================================================
+       7. BOTTOM NAVIGATION DOCK
+       ========================================================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid var(--gray-200);
+      z-index: 99999 !important;
+      pointer-events: auto !important;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+      height: 65px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem;
+      color: var(--gray-500);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 33.33%;
+      cursor: pointer;
+      transition: var(--transition);
+      pointer-events: auto !important;
+    }
+
+    .nav-item * {
+      pointer-events: none;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
+
+    /* ==========================================================================
+       8. MODALS & FORM INPUT STYLES
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      color: var(--gray-800);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-logo">⚛️ StepUp Science</div>
+    <div class="subtitle">A-Level & O-Level Physics & Chemistry Tuition Portal</div>
+    <div class="user-badge" id="user-status-bar">
+      👤 <span id="user-name-display">Guest Student</span> | <span id="user-role-display">Free Access</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- VIEW 1: MODULE LISTINGS (HOME) -->
+    <div id="view-modules" class="view-panel active">
+      <!-- Live Announcements & Upload Notifications Feed -->
+      <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; margin-bottom: 1.5rem;">
+        <div class="card-title" style="color: #166534; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>🔔 Latest Updates & Announcements</span>
+          <span class="badge-new" style="background-color: #10b981;">Live Feed</span>
+        </div>
+        <div id="announcements-feed-container" style="font-size: 0.875rem; color: #14532d; display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="padding: 8px 12px; background: rgba(255,255,255,0.7); border-radius: 6px; border-left: 3px solid #10b981;">
+            <strong>📚 New PDF Uploaded:</strong> Check modules for newly released revision notes & past paper solutions.
+          </div>
+          <div style="padding: 8px 12px; background: rgba(255,255,255,0.7); border-radius: 6px; border-left: 3px solid #7c3aed;">
+            <strong>📢 Group Session Bootcamp:</strong> Check the Book Session tab for upcoming weekend revision workshops.
+          </div>
+        </div>
+      </div>
+
+      <div class="card banner-card">
+        <div class="card-title">🎓 Complete ZIMSEC & Cambridge Syllabus Unlocked</div>
+        <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1.25rem;" id="sub-status-text">
+          O-Level ($3 single / $5 dual) | A-Level ($5 single / $8 dual). Unlock full revision notes and past paper solutions.
+        </p>
+        <button class="btn btn-primary" onclick="openSubscriptionModal()">
+          <i class="fa-solid fa-bolt"></i> Upgrade Tier (EcoCash / OneMoney)
+        </button>
+      </div>  
+  
+      <div class="card">
+        <div class="card-title">📚 Select Syllabus Level</div>
+        <h4 style="margin: 1rem 0 0.5rem 0;">🟩 O-Level ($3 single / $5 dual)</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+          <button class="btn btn-primary" onclick="loadModules('O-Level', 'Physics')">⚡ Physics</button>
+          <button class="btn btn-primary" onclick="loadModules('O-Level', 'Chemistry')">🧪 Chemistry</button>
+        </div>
+
+        <h4 style="margin: 1rem 0 0.5rem 0;">🟦 A-Level ($5 single / $8 dual)</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <button class="btn btn-primary" onclick="loadModules('A-Level', 'Physics')">⚛️ Physics</button>
+          <button class="btn btn-primary" onclick="loadModules('A-Level', 'Chemistry')">🧪 Chemistry</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Dynamically loaded modules appear here -->
+      </div>
+    </div>
+
+    <!-- VIEW 2: TUTORING BOOKING SYSTEM -->
+    <div id="view-booking" class="view-panel">
+      <!-- Group Session Announcement Banner -->
+      <div class="card" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; margin-bottom: 1.25rem;">
+        <div class="card-title" style="color: #6d28d9; margin-bottom: 0.5rem;">
+          📢 Upcoming Group Revision Sessions
+        </div>
+        <p style="font-size: 0.875rem; color: #4c1d95; line-height: 1.5; margin-bottom: 0.75rem;">
+          Join our live group problem-solving workshops! Group sessions cover high-yield past paper questions, exam techniques, and tricky practical concepts for O-Level & A-Level Physics & Chemistry.
+        </p>
+        <div style="font-size: 0.8rem; font-weight: 600; color: #6d28d9; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <span>⚡ Physics Crash Course: Saturdays</span>
+          <span>🧪 Chemistry Mechanism Workshop: Sundays</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-calendar-check"></i> Book Tutoring Sessions</div>
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+          Select an available 1-on-1 or group session slot below and secure your spot instantly via EcoCash.
+        </p>
+        <div id="sessionsListGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: PROFILE & ACCOUNT CONTROL -->
+    <div id="view-profile" class="view-panel">
+      <div class="card">
+        <div class="card-title">⚙️ Account Settings & Subscriptions</div>
+        <div style="margin-bottom: 1.5rem;">
+          <p style="margin-bottom: 0.4rem;"><strong>Account Name:</strong> <span id="profile-status">Guest Account</span></p>
+          <p style="margin-bottom: 0.4rem;"><strong>Subscription Access:</strong> <span id="profile-sub">Free Tier</span></p>
+        </div>
+
+        <div style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+          <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem;">Secure account access</h4>
+          <div class="form-group">
+            <label>Email address</label>
+            <input type="email" id="auth-email" class="form-control" placeholder="student@example.com">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="auth-password" class="form-control" placeholder="Enter password">
+            <a href="#" onclick="showForgotPasswordModal(); return false;" style="font-size: 0.85rem; color: var(--primary); text-decoration: underline; display: block; margin-top: 6px;">Forgot Password?</a>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button class="btn btn-primary" type="button" onclick="signInStudent()">Sign In</button>
+            <button class="btn btn-purple" type="button" onclick="signUpStudent()">Create Account</button>
+            <button class="btn btn-secondary" type="button" onclick="refreshAccessFromDatabase()">Refresh Access</button>
+            <button class="btn btn-secondary" type="button" onclick="signOutStudent()">Sign Out</button>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--gray-200);padding-top:1rem;margin-top:1rem;">
+          <h4 style="margin-bottom:0.75rem;font-size:0.95rem;">Performance summary</h4>
+          <p id="performance-summary" style="font-size:0.9rem;color:var(--gray-700);">Sign in to see quiz performance and progress tracking.</p>
+        </div>
+
+        <div style="border-top: 1px solid var(--gray-200);padding-top:1rem;margin-top:1rem;">
+          <h4 style="margin-bottom:0.75rem;font-size:0.95rem;">Student suggestion box</h4>
+          <div class="form-group">
+            <label>Your suggestion</label>
+            <textarea id="suggestion-message" class="form-control" rows="3" placeholder="Suggest a topic, video, document, quiz or website improvement"></textarea>
+          </div>
+          <button class="btn btn-primary" type="button" onclick="submitSuggestion()">Send Suggestion</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchView('modules', this)">
+      <span class="nav-icon">📚</span><span>Modules</span>
+    </div>
+    <div class="nav-item" onclick="switchView('booking', this)">
+      <span class="nav-icon">📅</span><span>Book Session</span>
+    </div>
+    <div class="nav-item" onclick="switchView('profile', this)">
+      <span class="nav-icon">👤</span><span>Profile</span>
+    </div>
+  </nav>
+
+  <!-- PAYNOW BOOKING PAYMENT MODAL -->
+  <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; padding:25px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 id="paymentModalTitle" style="margin:0;">Secure Payment</h3>
+        <button onclick="closePaymentModal()" style="border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div style="text-align:center; margin-bottom:20px;">
+        <p style="font-size:0.9rem; color:#555; margin-bottom:5px;">You are paying for:</p>
+        <p id="paymentItemDescription" style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">Tutoring Session</p>
+        <p style="font-size:1.5rem; font-weight:800; color:var(--accent);">$<span id="paymentModalAmount">10.00</span></p>
+      </div>
+      <form id="paymentForm" onsubmit="processBookingPayment(event)">
+        <input type="hidden" id="payUserId">
+        <input type="hidden" id="paySlotId">
+        <input type="hidden" id="paySlotTitle">
+        <input type="hidden" id="payAmount">
+        <div style="margin-bottom:15px;">
+          <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Specific Topic Focus (Optional)</label>
+          <textarea id="payStudentNotes" placeholder="e.g. Organic Chemistry mechanisms..." rows="2" class="form-control"></textarea>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">EcoCash / Mobile Number</label>
+          <input type="tel" id="paynowPhone" placeholder="07xxxxxxxx" required class="form-control">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Payment Method</label>
+          <select id="paynowMethod" class="form-control">
+            <option value="ecocash">EcoCash / OneMoney</option>
+          </select>
+        </div>
+        <div id="paymentStatusArea" style="text-align:center; display:none; margin-bottom:15px;">
+          <p style="color:blue;">Sending request... Please check your phone.</p>
+        </div>
+        <button type="submit" class="btn btn-primary" id="paySubmitBtn" style="width:100%;">Confirm Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PER-SUBJECT SUBSCRIPTION MODAL WITH DUAL DISCOUNTS -->
+  <div id="subscription-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 style="margin-top: 0; color: var(--dark);">Select Subscription Plan</h3>
+      <div style="margin-bottom: 15px;">
+        <label for="sub-level-select"><strong>Academic Level:</strong></label>
+        <select id="sub-level-select" onchange="calculateSelectedPrice()" class="form-control" style="margin-top: 6px;">
+          <option value="O-Level">O-Level ($3 single / $5 dual)</option>
+          <option value="A-Level">A-Level ($5 single / $8 dual)</option>
+        </select>
+      </div>
+      <div style="margin-bottom: 15px;">
+        <p style="margin-bottom: 8px;"><strong>Select Subjects:</strong></p>
+        <label style="display:block; margin-bottom: 8px; cursor: pointer;"><input type="checkbox" id="sub-chk-physics" onchange="calculateSelectedPrice()"> Physics</label>
+        <label style="display:block; cursor: pointer;"><input type="checkbox" id="sub-chk-chemistry" onchange="calculateSelectedPrice()"> Chemistry</label>
+      </div>
+      <div style="margin-bottom: 20px; padding: 12px; background: var(--gray-50); border-radius: 6px;">
+        <p style="margin: 0; font-size: 1.1em;">Total Amount: <strong id="sub-total-price" style="color: var(--success);">$0.00</strong></p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button onclick="startSubjectPayment()" class="btn btn-primary" style="flex:1;">Pay via Paynow</button>
+        <button onclick="document.getElementById('subscription-modal').style.display='none'" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="forgot-password-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="background: #ffffff; color: #1f2937; max-width: 420px; margin: 80px auto; border-radius: 12px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+        <h3 style="margin: 0; font-size: 1.2rem; color: #0f172a;">Reset Password</h3>
+        <button onclick="document.getElementById('forgot-password-modal').style.display='none'" style="background: transparent; border: none; font-size: 1.4rem; cursor: pointer;">&times;</button>
+      </div>
+      <p style="font-size: 0.9rem; color: #475569; margin-bottom: 16px;">Enter your email to receive a password reset link.</p>
+      <div style="margin-bottom: 16px;">
+        <input type="email" id="reset-email-input" placeholder="student@example.com" class="form-control">
+      </div>
+      <div id="reset-msg-box" style="display: none; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px;"></div>
+      <button id="send-reset-btn" onclick="handlePasswordResetRequest()" class="btn btn-primary" style="width: 100%;">Send Reset Link</button>
+    </div>
+  </div>
+
+  <!-- SECURE PDF VIEWER MODAL -->
+  <div id="pdf-viewer-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #0f172a; color: #fff;">
+      <span id="pdf-title" style="font-size: 0.9rem; font-weight: 600;">Study Material</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button onclick="prevPdfPage()" class="btn btn-secondary btn-sm" style="background:#334155; color:#fff;">Prev</button>
+        <span style="font-size: 0.85rem;"><span id="pdf-page-num">1</span> / <span id="pdf-page-count">--</span></span>
+        <button onclick="nextPdfPage()" class="btn btn-secondary btn-sm" style="background:#334155; color:#fff;">Next</button>
+        <button onclick="closePdfViewer()" class="btn btn-sm" style="background:#ef4444; color:#fff;">Close</button>
+      </div>
+    </div>
+    <div style="flex: 1; overflow: auto; display: flex; justify-content: center; padding: 16px; background: #1e293b;" oncontextmenu="return false;">
+      <canvas id="pdf-render-canvas" style="box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 4px; max-width: 100%; height: auto;"></canvas>
+    </div>
+  </div>
+
+  <!-- TERMS & SUPPORT MODAL -->
+  <div id="terms-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto; padding: 20px;">
+    <div style="background: #ffffff; color: #1f2937; max-width: 650px; margin: 40px auto; border-radius: 12px; padding: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 1.4rem; color: #0f172a;">Platform Terms & Support</h2>
+        <button onclick="document.getElementById('terms-modal').style.display='none'" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <p><strong>WhatsApp Support:</strong> +263 78 678 1956 / +263 71 040 1200</p>
+      <p><strong>Email:</strong> pimbirimanomacmillan@gmail.com</p>
+      <div style="margin-top: 24px; text-align: right;">
+        <button onclick="document.getElementById('terms-modal').style.display='none'" class="btn btn-primary" style="width: auto;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="text-align: center; padding: 20px; font-size: 0.85rem; color: #64748b;">
+    <p>&copy; StepUp Science. All rights reserved.</p>
+    <p>
+      <a href="#" onclick="document.getElementById('terms-modal').style.display='block'; return false;" style="color: var(--primary); text-decoration: underline;">Terms of Service</a> | 
+      <a href="#" onclick="document.getElementById('terms-modal').style.display='block'; return false;" style="color: var(--primary); text-decoration: underline;">Support Contact</a>
+    </p>
+  </footer>
+
+  <!-- PDF.JS & FULL APPLICATION SCRIPT -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null, scale = 1.3;
+    const canvas = document.getElementById('pdf-render-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+
+    function renderPdfPage(num) {
+      pageRendering = true;
+      pdfDoc.getPage(num).then(function(page) {
+        const viewport = page.getViewport({ scale: scale });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        const renderContext = { canvasContext: ctx, viewport: viewport };
+        page.render(renderContext).promise.then(function() {
+          pageRendering = false;
+          if (pageNumPending !== null) {
+            renderPdfPage(pageNumPending);
+            pageNumPending = null;
+          }
+        });
+      });
+      document.getElementById('pdf-page-num').innerText = num;
+    }
+
+    function queueRenderPage(num) {
+      if (pageRendering) { pageNumPending = num; } else { renderPdfPage(num); }
+    }
+
+    function prevPdfPage() {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+    }
+
+    function nextPdfPage() {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      queueRenderPage(pageNum);
+    }
+
+    function openPdfViewer(url, title) {
+      document.getElementById('pdf-title').innerText = title || 'Study Notes';
+      document.getElementById('pdf-viewer-modal').style.display = 'flex';
+      pageNum = 1;
+      pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+        pdfDoc = pdfDoc_;
+        document.getElementById('pdf-page-count').innerText = pdfDoc.numPages;
+        renderPdfPage(pageNum);
+      }).catch(err => alert('Error loading PDF: ' + err.message));
+    }
+
+    function closePdfViewer() {
+      document.getElementById('pdf-viewer-modal').style.display = 'none';
+    }
+
+    // App state & config
+    const APP_CONFIG = {
+      SUPABASE_URL: 'https://phiyuvpwvaaarnockyqm.supabase.co',
+      SUPABASE_ANON_KEY: 'sb_publishable_NFYozwSjCZ1gB8FONH8FhA_r-MJCAq6',
+      STORAGE_BUCKET: 'protected-content',
+      PAYMENT_FUNCTION_URL: '/api/paynow-pay'
+    };
+
+    let supabaseClient = null;
+    let currentSession = null;
+    let currentProfile = null;
+    let currentSlotPurchase = null;
+
+    function initSupabase() {
+      if (window.supabase) {
+        supabaseClient = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON_KEY);
+      }
+    }
+
+    function switchView(viewName, element) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.add('active');
+
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openSubscriptionModal() {
+      document.getElementById('subscription-modal').style.display = 'flex';
+      calculateSelectedPrice();
+    }
+
+    function calculateSelectedPrice() {
+      const levelSelect = document.getElementById('sub-level-select');
+      const physChecked = document.getElementById('sub-chk-physics')?.checked;
+      const chemChecked = document.getElementById('sub-chk-chemistry')?.checked;
+
+      if (!levelSelect) return 0;
+      const level = levelSelect.value;
+
+      let total = 0;
+      if (physChecked && chemChecked) {
+        total = level === 'O-Level' ? 5 : 8; // Dual subject discounts ($5 O-Level / $8 A-Level)
+      } else if (physChecked || chemChecked) {
+        total = level === 'O-Level' ? 3 : 5; // Single subject pricing ($3 O-Level / $5 A-Level)
+      }
+
+      const priceDisplay = document.getElementById('sub-total-price');
+      if (priceDisplay) priceDisplay.innerText = `$${total}.00`;
+      return total;
+    }
+
+    async function startSubjectPayment() {
+      const level = document.getElementById('sub-level-select').value;
+      const physChecked = document.getElementById('sub-chk-physics').checked;
+      const chemChecked = document.getElementById('sub-chk-chemistry').checked;
+      const subjects = [];
+      if (physChecked) subjects.push('Physics');
+      if (chemChecked) subjects.push('Chemistry');
+
+      if (subjects.length === 0) return alert('Please select at least one subject.');
+
+      const amount = calculateSelectedPrice();
+      const phone = prompt('Enter your EcoCash or OneMoney number (e.g. 0771234567):');
+      if (!phone) return;
+
+      try {
+        const res = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentProfile?.id,
+            email: currentSession?.user?.email,
+            level, subjects, amount, phone, method: 'ecocash'
+          })
+        });
+        const data = await res.json();
+        if (data.success || data.redirectUrl) {
+          alert(`Payment prompt sent to ${phone} for $${amount}. Enter your PIN to complete verification.`);
+          document.getElementById('subscription-modal').style.display = 'none';
+        } else {
+          alert(data.error || 'Could not initiate payment.');
+        }
+      } catch (err) {
+        alert('Network connection error.');
+      }
+    }
+
+    async function refreshStudentContext() {
+      if (!supabaseClient) return;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      currentSession = session || null;
+
+      if (currentSession?.user) {
+        const { data: profile } = await supabaseClient
+          .from('profiles').select('*').eq('id', currentSession.user.id).maybeSingle();
+        if (profile) currentProfile = profile;
+        initSessionGuard(currentSession.user.id);
+      }
+      renderStaticTierState();
+      loadAvailableSlots();
+      loadPerformanceSummary();
+      loadAnnouncementsFeed();
+    }
+
+    function renderStaticTierState() {
+      document.getElementById('user-name-display').innerText = currentProfile?.full_name || currentSession?.user?.email || 'Guest Student';
+      document.getElementById('profile-sub').innerText = currentProfile?.access_tier || 'Free Tier';
+      document.getElementById('profile-status').innerText = currentProfile?.full_name || 'Guest Account';
+      document.getElementById('user-role-display').innerText = currentProfile?.access_tier ? `${currentProfile.access_tier} Active` : 'Free Access';
+    }
+
+    async function loadAnnouncementsFeed() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      const container = document.getElementById('announcements-feed-container');
+      if (!container || error || !data || data.length === 0) return;
+
+      container.innerHTML = data.map(item => {
+        const isPdf = item.category === 'pdf_upload';
+        const borderColor = isPdf ? '#10b981' : '#7c3aed';
+        const icon = isPdf ? '📚 New PDF Uploaded:' : '📢 Group Session:';
+        return `
+          <div style="padding: 8px 12px; background: rgba(255,255,255,0.7); border-radius: 6px; border-left: 3px solid ${borderColor};">
+            <strong>${icon}</strong> ${item.title}: ${item.message}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadModules(level, subject) {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('modules').select('*').eq('is_published', true).eq('level', level).eq('subject', subject);
+
+      const grid = document.querySelector('.grid-2');
+      if (error || !data || data.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--gray-600);">No modules uploaded for this filter yet.</p>';
+        return;
+      }
+
+      grid.innerHTML = data.map(mod => `
+        <div class="resource-card">
+          <div>
+            <div class="resource-header">
+              <span class="subject-tag tag-${mod.subject.toLowerCase()}">${mod.subject}</span>
+              <span class="badge badge-free">${mod.required_tier || 'FREE'}</span>
+            </div>
+            <h4 style="margin-top:0.6rem;">${mod.title}</h4>
+            <p style="font-size:0.825rem; color:var(--gray-600); margin-top:0.3rem;">${mod.description || ''}</p>
+          </div>
+          <button class="btn btn-primary" onclick="openPdfViewer('${mod.public_url || ''}', '${mod.title}')">Read Notes</button>
+        </div>
+      `).join('');
+    }
+
+    async function loadAvailableSlots() {
+      if (!supabaseClient) return;
+      const { data: slots, error } = await supabaseClient
+        .from('booking_slots').select('*').eq('is_active', true).order('start_time', { ascending: true });
+
+      const grid = document.getElementById('sessionsListGrid');
+      if (!grid) return;
+      if (error || !slots || slots.length === 0) {
+        grid.innerHTML = '<p style="color:var(--gray-600);">No tutoring sessions available right now.</p>';
+        return;
+      }
+
+      grid.innerHTML = slots.map(s => {
+        const isFull = s.booked_count >= s.max_capacity;
+        const startTime = new Date(s.start_time);
+        return `
+          <div style="background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:20px;">
+            <h3 style="margin:0 0 10px 0; font-size:1.1rem;">${s.title}</h3>
+            <p style="font-size:0.9rem; color:var(--gray-600); margin-bottom:15px;">🕒 ${startTime.toLocaleString()}</p>
+            ${isFull ? '<button disabled class="btn btn-secondary" style="width:100%;">Fully Booked</button>' : `<button onclick="initiateSlotPurchase('${s.id}', '${s.title}', ${s.price})" class="btn btn-primary" style="width:100\%;">Book & Pay ($${s.price})</button>`}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function initiateSlotPurchase(slotId, slotTitle, price) {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session?.user) return alert('Please sign in to book a session.');
+      document.getElementById('paymentModalTitle').textContent = "Confirm Booking";
+      document.getElementById('paymentItemDescription').innerHTML = `<b>${slotTitle}</b>`;
+      document.getElementById('paymentModalAmount').textContent = Number(price).toFixed(2);
+      document.getElementById('payUserId').value = session.user.id;
+      document.getElementById('paySlotId').value = slotId;
+      document.getElementById('paySlotTitle').value = slotTitle;
+      document.getElementById('payAmount').value = Number(price).toFixed(2);
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+    }
+
+    async function processBookingPayment(e) {
+      e.preventDefault();
+      const phone = document.getElementById('paynowPhone').value.trim();
+      const userId = document.getElementById('payUserId').value;
+      const slotId = document.getElementById('paySlotId').value;
+      const slotTitle = document.getElementById('paySlotTitle').value;
+      const amount = document.getElementById('payAmount').value;
+      const studentNotes = document.getElementById('payStudentNotes').value.trim();
+
+      const statusArea = document.getElementById('paymentStatusArea');
+      statusArea.style.display = 'block';
+      statusArea.innerHTML = '<p style="color:blue;">Contacting Paynow...</p>';
+
+      try {
+        const response = await fetch('/api/paynow-pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, slotId, slotTitle, amount, phone, method: 'ecocash', studentNotes })
+        });
+        const result = await response.json();
+        if (result.success && result.pollUrl) {
+          statusArea.innerHTML = '<p style="color:orange;">USSD prompt sent to phone. Enter your PIN...</p>';
+          startBookingPolling();
+        } else {
+          throw new Error(result.error || 'Payment failed');
+        }
+      } catch (err) {
+        statusArea.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    }
+
+    function startBookingPolling() {
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        if (attempts > 30) { clearInterval(interval); return; }
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.user) return;
+        const { data: booking } = await supabaseClient.from('bookings').select('status').eq('student_id', session.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+        if (booking && booking.status === 'confirmed') {
+          clearInterval(interval);
+          document.getElementById('paymentStatusArea').innerHTML = '<p style="color:green; font-weight:bold;">Booking Confirmed!</p>';
+          loadAvailableSlots();
+          setTimeout(closePaymentModal, 2500);
+        }
+      }, 3000);
+    }
+
+    async function initSessionGuard(userId) {
+      let token = localStorage.getItem('stepup_session_token');
+      if (!token) {
+        token = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('stepup_session_token', token);
+      }
+      await supabaseClient.rpc('register_active_session', { user_id: userId, session_id: token });
+    }
+
+    async function signUpStudent() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      if (!email || !password) return alert('Enter email and password.');
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) return alert(error.message);
+      alert('Account created successfully! You can now sign in.');
+    }
+
+    async function signInStudent() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      if (!email || !password) return alert('Enter email and password.');
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      await refreshStudentContext();
+      alert('Signed in successfully.');
+    }
+
+    async function signOutStudent() {
+      localStorage.removeItem('stepup_session_token');
+      await supabaseClient.auth.signOut();
+      currentSession = null;
+      currentProfile = null;
+      renderStaticTierState();
+      alert('Signed out successfully.');
+    }
+
+    async function refreshAccessFromDatabase() {
+      await refreshStudentContext();
+      alert('Access refreshed.');
+    }
+
+    async function loadPerformanceSummary() {
+      const target = document.getElementById('performance-summary');
+      if (!target || !supabaseClient || !currentSession?.user) return;
+      const { data } = await supabaseClient.from('quiz_results').select('score, total, subject').eq('student_id', currentSession.user.id);
+      if (!data || data.length === 0) { target.innerText = 'No quiz attempts recorded yet.'; return; }
+      target.innerText = `Total quiz attempts recorded: ${data.length}`;
+    }
+
+    async function submitSuggestion() {
+      const message = document.getElementById('suggestion-message').value.trim();
+      if (!message) return alert('Type a suggestion first.');
+      const { error } = await supabaseClient.from('suggestions').insert({
+        student_id: currentSession?.user?.id || null,
+        student_name: currentProfile?.full_name || currentSession?.user?.email || 'Guest',
+        message, status: 'new'
+      });
+      if (error) alert(error.message);
+      else { alert('Suggestion sent successfully.'); document.getElementById('suggestion-message').value = ''; }
+    }
+
+    async function handlePasswordResetRequest() {
+      const email = document.getElementById('reset-email-input').value.trim();
+      const msgBox = document.getElementById('reset-msg-box');
+      if (!email) { msgBox.style.display = 'block'; msgBox.innerText = 'Enter your email.'; return; }
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://stepupscience-if9s.vercel.app/?type=recovery'
+      });
+      msgBox.style.display = 'block';
+      msgBox.innerText = error ? error.message : 'Reset link sent! Check your email inbox.';
+    }
+
+    function showForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').style.display = 'block';
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+      await refreshStudentContext();
+    });
+  </script>
+</body>
+</html>
