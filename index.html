@@ -927,18 +927,6 @@
       alert('Network connection error.');
     }
 
-        const data = await res.json();
-        if (data.success || data.redirectUrl) {
-          alert(`Payment prompt sent to ${phone} for $${amount}. Enter your PIN to complete verification.`);
-          document.getElementById('subscription-modal').style.display = 'none';
-        } else {
-          alert(data.error || 'Could not initiate payment.');
-        }
-      } catch (err) {
-        alert('Network connection error.');
-      }
-    }
-
     async function refreshStudentContext() {
       if (!supabaseClient) return;
       const { data: { session } } = await supabaseClient.auth.getSession();
