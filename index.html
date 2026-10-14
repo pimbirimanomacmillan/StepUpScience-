@@ -892,33 +892,41 @@
       const phone = prompt('Enter your EcoCash or OneMoney number (e.g. 0771234567):');
       if (!phone) return;
 
-      try {
-        const res = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           try {
-  // Fetch active Supabase session directly to ensure valid user details
-  const { data: { session } } = await supabase.auth.getSession();
+      // Fetch active Supabase session directly
+      const { data: { session } } = await supabase.auth.getSession();
 
-  if (!session?.user) {
-    return alert('Please sign in to your account to continue.');
-  }
+      if (!session?.user) {
+        return alert('Please sign in to your account to continue.');
+      }
 
-  const res = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      userId: session.user.id,
-      email: session.user.email,
-      level: level,
-      subjects: subjects,
-      amount: amount,
-      phone: phone,
-      method: 'ecocash'
-    })
-  });
+      const res = await fetch(APP_CONFIG.PAYMENT_FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user.id,
+          email: session.user.email,
+          level: level,
+          subjects: subjects,
+          amount: amount,
+          phone: phone,
+          method: 'ecocash'
+        })
+      });
 
-        });
+      const data = await res.json();
+
+      if (data.success || data.redirectUrl) {
+        alert(`Payment prompt sent to ${phone} for $${amount}. Enter your PIN to complete verification.`);
+        document.getElementById('subscription-modal').style.display = 'none';
+      } else {
+        alert(data.error || 'Could not initiate payment.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network connection error.');
+    }
+
         const data = await res.json();
         if (data.success || data.redirectUrl) {
           alert(`Payment prompt sent to ${phone} for $${amount}. Enter your PIN to complete verification.`);
